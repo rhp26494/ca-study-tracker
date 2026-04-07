@@ -1,914 +1,1089 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0d0f14">
-<title>CA Inter Study OS</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CA Inter — Study & Revision Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0d0f14;--surface:#13161e;--surface2:#1a1e2a;--border:#252a38;
-  --accent:#f5c842;--accent3:#10b981;--accent4:#f97316;--danger:#ef4444;
-  --text:#e8eaf0;--muted:#6b7280;--muted2:#9ca3af;
-  --p5:#a78bfa;--p6:#34d399;
-  --nav-h:64px;--hdr-h:56px;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{height:100%;}
-body{
-  font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);
-  min-height:100%;overflow-x:hidden;
-  padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));
-}
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:radial-gradient(ellipse 80% 60% at 20% 0%,rgba(163,130,255,.06),transparent 60%),
-             radial-gradient(ellipse 60% 50% at 80% 100%,rgba(52,211,153,.05),transparent 60%);
-}
-::-webkit-scrollbar{width:3px;height:3px;}
-::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+/* ═══════════════════════════════════════
+   DESIGN TOKENS — LIGHT THEME
+═══════════════════════════════════════ */
+:root {
+  --bg:        #f4f6fb;
+  --bg2:       #edf0f7;
+  --surface:   #ffffff;
+  --surface2:  #f8f9fd;
+  --border:    #e3e7f0;
+  --border2:   #cdd3e6;
+  --shadow:    0 1px 3px rgba(50,60,100,.06), 0 4px 16px rgba(50,60,100,.04);
+  --shadow-md: 0 2px 8px rgba(50,60,100,.09), 0 8px 24px rgba(50,60,100,.06);
 
-/* HEADER */
-header{
-  position:sticky;top:0;z-index:200;height:var(--hdr-h);
-  display:flex;align-items:center;
-  background:rgba(13,15,20,.95);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  /* paper colours */
+  --p5:        #5b21b6;
+  --p5l:       #ede9fe;
+  --p5m:       #8b5cf6;
+  --p6:        #0f766e;
+  --p6l:       #ccfbf1;
+  --p6m:       #14b8a6;
+
+  /* accents */
+  --gold:      #d97706;
+  --red:       #dc2626;
+  --orange:    #ea580c;
+  --blue:      #2563eb;
+  --green:     #15803d;
+
+  /* revision ring colours — light to dark green */
+  --rv1-bg:#dcfce7; --rv1-bd:#86efac; --rv1-tx:#15803d;
+  --rv2-bg:#bbf7d0; --rv2-bd:#4ade80; --rv2-tx:#166534;
+  --rv3-bg:#a7f3d0; --rv3-bd:#22c55e; --rv3-tx:#14532d;
+  --rv4-bg:#6ee7b7; --rv4-bd:#16a34a; --rv4-tx:#052e16;
+  --rv5-bg:#16a34a; --rv5-bd:#15803d; --rv5-tx:#ffffff;
+
+  --text:      #1a1f36;
+  --text2:     #434b6b;
+  --muted:     #8892b8;
+  --muted2:    #b6bdd6;
+
+  --sw: 238px;
+  --hh: 54px;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; overflow:hidden; }
+body { font-family:'DM Mono',monospace; background:var(--bg); color:var(--text); display:flex; flex-direction:column; }
+
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:var(--bg2); }
+::-webkit-scrollbar-thumb { background:var(--border2); border-radius:4px; }
+
+/* ─── TOPBAR ─── */
+.topbar {
+  height:var(--hh); flex-shrink:0;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 24px;
+  background:var(--surface);
   border-bottom:1px solid var(--border);
+  box-shadow:var(--shadow);
+  position:relative; z-index:200;
 }
-.hdr{width:100%;max-width:1280px;margin:0 auto;padding:0 16px;display:flex;align-items:center;gap:10px;justify-content:space-between;}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.1rem;letter-spacing:-.5px;white-space:nowrap;}
-.logo span{color:var(--accent);}
-.hdr-pills{display:flex;gap:8px;flex-shrink:0;}
-.pill{font-size:.62rem;border:1px solid var(--border);padding:4px 9px;border-radius:20px;color:var(--muted2);background:var(--surface);}
-#exam-countdown{color:var(--accent);border-color:rgba(245,200,66,.35);background:rgba(245,200,66,.07);}
+.logo { display:flex; align-items:center; gap:10px; }
+.logo-mark {
+  width:30px; height:30px; border-radius:7px;
+  background:linear-gradient(135deg,var(--p5),var(--p6));
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Syne',sans-serif; font-weight:800; font-size:.68rem; color:#fff;
+  flex-shrink:0;
+}
+.logo-text { font-family:'Syne',sans-serif; font-weight:800; font-size:.92rem; color:var(--text); letter-spacing:-.3px; }
+.logo-text span { color:var(--p5); }
+.tb-right { display:flex; align-items:center; gap:10px; }
+.tb-pill { font-size:.62rem; padding:4px 12px; border-radius:20px; border:1px solid var(--border2); color:var(--text2); background:var(--bg2); white-space:nowrap; }
+.tb-pill.exam { color:#92400e; border-color:#fde68a; background:#fffbeb; }
+.tb-clock { font-size:.65rem; color:var(--muted); font-variant-numeric:tabular-nums; min-width:76px; text-align:right; }
+.date-inp {
+  font-family:'DM Mono',monospace; font-size:.62rem;
+  border:1px solid var(--border2); border-radius:20px;
+  padding:4px 12px; background:var(--bg2); color:var(--text2);
+  cursor:pointer; outline:none; transition:border-color .13s;
+}
+.date-inp:focus { border-color:var(--p5); }
 
-/* BOTTOM NAV */
-.bnav{
-  position:fixed;bottom:0;left:0;right:0;z-index:200;
-  height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));
-  padding-bottom:env(safe-area-inset-bottom,0px);
-  background:rgba(13,15,20,.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-top:1px solid var(--border);display:flex;align-items:stretch;
-}
-.nb{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:3px;border:none;background:none;cursor:pointer;color:var(--muted);
-  transition:color .2s;padding:6px 2px;position:relative;
-}
-.nb.active{color:var(--accent);}
-.nb.active.p5{color:var(--p5);}
-.nb.active.p6{color:var(--p6);}
-.nb::after{
-  content:'';position:absolute;top:0;left:25%;right:25%;height:2px;border-radius:0 0 2px 2px;
-  background:currentColor;opacity:0;transition:opacity .2s;
-}
-.nb.active::after{opacity:1;}
-.nb-icon{font-size:1.2rem;line-height:1;}
-.nb-lbl{font-family:'Syne',sans-serif;font-weight:700;font-size:.55rem;text-transform:uppercase;letter-spacing:.5px;}
+/* ─── LAYOUT ─── */
+.shell { display:flex; flex:1; overflow:hidden; }
 
-/* MAIN */
-.main{max-width:1280px;margin:0 auto;padding:16px;position:relative;z-index:1;}
-.tab-panel{display:none;animation:fi .2s ease;}
-.tab-panel.active{display:block;}
-@keyframes fi{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width:var(--sw); flex-shrink:0;
+  display:flex; flex-direction:column;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  overflow-y:auto;
+  padding:10px 0 24px;
+  box-shadow:2px 0 8px rgba(50,60,100,.04);
+}
+.sb-lbl { font-size:.52rem; letter-spacing:1px; text-transform:uppercase; color:var(--muted); padding:14px 16px 5px; }
+.sb-btn {
+  display:flex; align-items:center; gap:9px;
+  padding:9px 16px; border:none; background:none; cursor:pointer;
+  color:var(--text2); font-family:'DM Mono',monospace; font-size:.7rem;
+  text-align:left; width:100%;
+  border-left:2px solid transparent; transition:all .13s;
+}
+.sb-btn:hover { background:var(--bg2); color:var(--text); }
+.sb-btn.active       { background:var(--p5l); color:var(--p5); border-left-color:var(--p5); }
+.sb-btn.active.p6n   { background:var(--p6l); color:var(--p6); border-left-color:var(--p6); }
+.sb-btn.active.gn    { background:#f0fdf4; color:var(--green); border-left-color:var(--green); }
+.sb-btn.active.orn   { background:#fff7ed; color:var(--orange); border-left-color:var(--orange); }
+.sb-icon { font-size:.9rem; width:16px; text-align:center; flex-shrink:0; }
+.sb-badge { margin-left:auto; font-size:.52rem; padding:2px 7px; border-radius:10px; background:var(--bg2); color:var(--muted); border:1px solid var(--border); }
+.sb-div { height:1px; background:var(--border); margin:6px 16px; }
 
-/* STAT GRID */
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
-.stat-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:12px;
-  padding:14px 16px;position:relative;overflow:hidden;
-}
-.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
-.stat-card.c1::after{background:var(--accent);}
-.stat-card.c2::after{background:var(--p5);}
-.stat-card.c3::after{background:var(--p6);}
-.stat-card.c4::after{background:var(--accent4);}
-.stat-lbl{font-size:.6rem;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px;}
-.stat-val{font-family:'Syne',sans-serif;font-size:1.9rem;font-weight:800;line-height:1;}
-.stat-sub{font-size:.6rem;color:var(--muted2);margin-top:4px;}
+.sb-foot { margin-top:auto; padding:14px 16px 0; border-top:1px solid var(--border); }
+.sf-ttl { font-size:.52rem; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin-bottom:9px; }
+.sf-row { display:flex; justify-content:space-between; font-size:.62rem; color:var(--text2); margin-bottom:5px; }
+.sf-row strong { color:var(--text); }
+.sf-bar { height:4px; background:var(--bg2); border-radius:2px; overflow:hidden; margin-bottom:9px; border:1px solid var(--border); }
+.sf-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--p5),var(--p6)); transition:width .4s; }
 
-/* PAPER CARD */
-.paper-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;}
-.pc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
-.paper-tag{
-  font-family:'Syne',sans-serif;font-size:.62rem;font-weight:700;
-  padding:3px 9px;border-radius:4px;letter-spacing:1px;text-transform:uppercase;
-}
-.paper-tag.p5{background:rgba(167,139,250,.15);color:var(--p5);border:1px solid rgba(167,139,250,.3);}
-.paper-tag.p6{background:rgba(52,211,153,.12);color:var(--p6);border:1px solid rgba(52,211,153,.3);}
-.paper-title{font-family:'Instrument Serif',serif;font-size:1.15rem;font-style:italic;margin-bottom:2px;}
-.paper-sub{font-size:.62rem;color:var(--muted);}
-.pbar{height:5px;background:var(--border);border-radius:3px;margin:10px 0 8px;overflow:hidden;}
-.pbar-fill{height:100%;border-radius:3px;transition:width .5s;}
-.p5-fill{background:linear-gradient(90deg,#7c3aed,#a78bfa);}
-.p6-fill{background:linear-gradient(90deg,#059669,#34d399);}
-.pstats{display:flex;gap:12px;flex-wrap:wrap;font-size:.62rem;color:var(--muted2);}
-.pstats strong{color:var(--text);}
+/* ─── CONTENT ─── */
+.content { flex:1; overflow-y:auto; background:var(--bg); }
+.page { display:none; padding:24px 28px; animation:fi .15s ease; }
+.page.active { display:block; }
+@keyframes fi { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
 
-/* ANALYSIS */
-.acard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;}
-.atitle{font-family:'Syne',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.5px;text-transform:uppercase;color:var(--muted2);margin-bottom:14px;}
-.tbar-list{display:flex;flex-direction:column;gap:10px;}
-.tbar-lbl{display:flex;justify-content:space-between;font-size:.6rem;color:var(--muted2);margin-bottom:3px;}
-.tbar-lbl span:last-child{color:var(--text);}
-.tbar-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
-.tbar-fill{height:100%;border-radius:2px;}
+/* ─── PAGE HEADER ─── */
+.ph { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:20px; }
+.ph-title { font-family:'Syne',sans-serif; font-size:1.2rem; font-weight:800; color:var(--text); }
+.ph-sub { font-size:.62rem; color:var(--muted); margin-top:3px; }
+.ph-act { display:flex; gap:8px; align-items:center; }
 
-/* FILTER BAR */
-.filter-bar{display:flex;gap:6px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;-ms-overflow-style:none;scrollbar-width:none;}
-.filter-bar::-webkit-scrollbar{display:none;}
-.fchip{
-  font-family:'Syne',sans-serif;font-size:.6rem;font-weight:600;
-  padding:6px 12px;border-radius:20px;border:1px solid var(--border);
-  background:var(--surface2);color:var(--muted);cursor:pointer;
-  white-space:nowrap;transition:all .15s;text-transform:uppercase;letter-spacing:.4px;
-}
-.fchip.active{background:var(--surface);color:var(--text);border-color:var(--muted2);}
-.fchip.fc-done.active{color:var(--accent3);border-color:var(--accent3);}
-.fchip.fc-ip.active{color:#60a5fa;border-color:#60a5fa;}
-.fchip.fc-rev.active{color:var(--accent);border-color:var(--accent);}
+/* ─── BUTTONS ─── */
+.btn { font-family:'Syne',sans-serif; font-weight:600; font-size:.7rem; padding:7px 15px; border-radius:7px; border:1px solid transparent; cursor:pointer; transition:all .13s; }
+.btn-primary { background:var(--p5); color:#fff; }
+.btn-primary:hover { background:#4c1d95; }
+.btn-ghost { background:var(--surface); border-color:var(--border2); color:var(--text2); }
+.btn-ghost:hover { background:var(--bg2); color:var(--text); }
+.btn-warn { background:none; border-color:#fca5a5; color:var(--red); }
+.btn-warn:hover { background:#fef2f2; }
+.btn-sm { padding:5px 11px; font-size:.62rem; }
 
-/* TOPIC HEADER */
-.topic-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
-.topic-title{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:700;}
-.tcnt{font-size:.58rem;padding:3px 8px;border-radius:20px;background:var(--surface2);color:var(--muted2);border:1px solid var(--border);}
-.add-btn{
-  margin-left:auto;font-family:'DM Mono',monospace;font-size:.65rem;
-  padding:8px 14px;background:none;border:1px solid var(--border);
-  color:var(--muted2);border-radius:8px;cursor:pointer;min-height:36px;transition:all .2s;
-}
-.add-btn:active{border-color:var(--accent);color:var(--accent);}
+/* ─── STAT GRID ─── */
+.stat-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:18px; }
+.stat-box { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 18px; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+.stat-box::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+.s0::before{background:var(--gold);}  .s1::before{background:var(--p5);}
+.s2::before{background:var(--p6);}   .s3::before{background:var(--orange);}
+.s4::before{background:var(--blue);}
+.stat-lbl { font-size:.54rem; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; margin-bottom:6px; }
+.stat-val { font-family:'Syne',sans-serif; font-size:1.85rem; font-weight:800; color:var(--text); line-height:1; }
+.stat-hint { font-size:.58rem; color:var(--muted); margin-top:4px; }
 
-/* TOPIC CARD (mobile) */
-.tcard{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:12px;padding:14px;margin-bottom:10px;
-  border-left-width:3px;border-left-style:solid;
-}
-.tcard.status-done{border-left-color:var(--accent3);}
-.tcard.status-in-progress{border-left-color:#60a5fa;}
-.tcard.status-revision{border-left-color:var(--accent);}
-.tcard.status-not-started{border-left-color:var(--border);}
-.tc-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
-.tc-info{flex:1;min-width:0;}
-.tc-name{font-size:.82rem;color:var(--text);line-height:1.4;margin-bottom:3px;}
-.tc-ch{font-size:.6rem;color:var(--muted);}
-.sbadge{font-size:.58rem;padding:3px 8px;border-radius:4px;font-weight:500;white-space:nowrap;}
-.s-ns{background:rgba(107,114,128,.15);color:var(--muted2);border:1px solid rgba(107,114,128,.3);}
-.s-ip{background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3);}
-.s-rv{background:rgba(245,200,66,.12);color:var(--accent);border:1px solid rgba(245,200,66,.3);}
-.s-dn{background:rgba(16,185,129,.12);color:var(--accent3);border:1px solid rgba(16,185,129,.3);}
-.tc-prog{margin-bottom:10px;}
-.prog-row{display:flex;align-items:center;justify-content:space-between;font-size:.6rem;margin-bottom:4px;}
-.prog-row span:last-child{color:var(--text);}
-.tc-mid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;}
-.tcf{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;}
-.tcf-lbl{font-size:.55rem;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;}
-.tcf-inp{
-  width:100%;background:none;border:none;color:var(--text);
-  font-family:'DM Mono',monospace;font-size:.85rem;font-weight:700;padding:0;
-  -moz-appearance:textfield;appearance:textfield;
-}
-.tcf-inp::-webkit-outer-spin-button,.tcf-inp::-webkit-inner-spin-button{-webkit-appearance:none;}
-.tcf-inp:focus{outline:none;}
-.tcf-val{font-size:.85rem;font-family:'Syne',sans-serif;font-weight:700;}
-.tc-actions{display:flex;gap:8px;align-items:center;}
-.ssel{
-  flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);
-  font-family:'DM Mono',monospace;font-size:.65rem;padding:8px 10px;
-  border-radius:8px;min-height:38px;
-}
-.ssel:focus{outline:none;border-color:var(--accent);}
-.ibtn{
-  width:38px;height:38px;border-radius:8px;border:1px solid var(--border);
-  background:none;color:var(--muted);cursor:pointer;font-size:.9rem;
-  display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;
-}
-.ibtn:active{border-color:var(--accent);color:var(--accent);background:rgba(245,200,66,.08);}
-.ibtn.del:active{border-color:var(--danger);color:var(--danger);background:rgba(239,68,68,.08);}
-.ibtn.hn{color:var(--accent);}
-.pdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px;}
-.pdot.high{background:#f87171;}
-.pdot.medium{background:var(--accent);}
-.pdot.low{background:var(--muted);}
+/* ─── RING CARD ─── */
+.ring-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px 22px; margin-bottom:14px; display:flex; align-items:center; gap:20px; box-shadow:var(--shadow); }
+.ring-info { flex:1; }
+.ring-title { font-family:'Syne',sans-serif; font-size:.9rem; font-weight:700; margin-bottom:2px; }
+.ring-sub { font-size:.6rem; color:var(--muted); }
+.ring-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:12px; }
+.rs { background:var(--bg2); border:1px solid var(--border); border-radius:7px; padding:8px 10px; text-align:center; }
+.rs-v { font-family:'Syne',sans-serif; font-size:1.1rem; font-weight:800; color:var(--text); }
+.rs-l { font-size:.52rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-top:2px; }
 
-/* SCHEDULE */
-.sched-grid{display:grid;gap:12px;}
-.scard{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;}
-.stitle{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted2);margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
-.form-lbl{font-size:.6rem;color:var(--muted2);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px;display:block;}
-.finp,.fsel{
-  width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);
-  font-family:'DM Mono',monospace;font-size:.78rem;padding:10px 12px;border-radius:8px;
-  min-height:42px;transition:border-color .2s;
-}
-.finp:focus,.fsel:focus{outline:none;border-color:var(--accent);}
-.fsel option{background:var(--surface);}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.fgrp{margin-bottom:12px;}
-.srow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
-.slot-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
-.sdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.sname{font-size:.76rem;color:var(--text);}
-.smeta{font-size:.6rem;color:var(--muted);margin-top:2px;}
-.add-slot-btn{
-  width:100%;margin-top:8px;padding:12px;background:none;
-  border:1px dashed var(--border);border-radius:10px;
-  color:var(--muted);font-family:'DM Mono',monospace;font-size:.72rem;cursor:pointer;
-}
-.add-slot-btn:active{border-color:var(--accent);color:var(--accent);}
-.week-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
-.week-hdr{display:grid;grid-template-columns:44px repeat(7,minmax(36px,1fr));gap:3px;margin-bottom:4px;min-width:320px;}
-.wdl{text-align:center;font-size:.55rem;color:var(--muted);text-transform:uppercase;}
-.wdn{font-size:.72rem;font-family:'Syne',sans-serif;font-weight:700;color:var(--text);text-align:center;}
-.wdn.today{color:var(--accent);}
-.week-grid{display:grid;grid-template-columns:44px repeat(7,minmax(36px,1fr));gap:3px;min-width:320px;}
-.hlbl{font-size:.52rem;color:var(--muted);text-align:right;padding-right:5px;padding-top:4px;}
-.wcell{height:24px;border-radius:3px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;}
-.wcell.p5s{background:rgba(167,139,250,.3);border-color:rgba(167,139,250,.5);}
-.wcell.p6s{background:rgba(52,211,153,.25);border-color:rgba(52,211,153,.4);}
-.sdivider{display:flex;align-items:center;gap:10px;margin:14px 0 12px;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;}
-.sdivider::before,.sdivider::after{content:'';flex:1;height:1px;background:var(--border);}
+/* ─── EXAM BAR ─── */
+.exam-bar { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:13px 20px; margin-bottom:14px; display:flex; align-items:center; gap:14px; box-shadow:var(--shadow); }
+.eb-lbl { font-size:.6rem; color:var(--muted); white-space:nowrap; }
+.eb-track { flex:1; height:6px; background:var(--bg2); border-radius:3px; overflow:hidden; border:1px solid var(--border); }
+.eb-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,#fbbf24,#f59e0b); transition:width .4s; }
+.eb-count { font-family:'Syne',sans-serif; font-weight:700; font-size:.85rem; color:#92400e; white-space:nowrap; }
 
-/* TIMER */
-.tcard-timer{
-  background:var(--surface);border:1px solid var(--border);border-radius:16px;
-  padding:24px 20px;margin-bottom:14px;
-  display:flex;flex-direction:column;align-items:center;gap:16px;
-}
-.tdisplay{
-  font-family:'Syne',sans-serif;font-size:3.4rem;font-weight:800;
-  color:var(--accent);letter-spacing:-2px;line-height:1;
-}
-.tdisplay.run{animation:tp 1s infinite alternate;}
-@keyframes tp{from{opacity:1;}to{opacity:.7;};}
-.ttopic{font-size:.78rem;color:var(--muted2);text-align:center;}
-.ttopic span{color:var(--text);}
-.tsel-wrap{width:100%;}
-.tsel{
-  width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);
-  font-family:'DM Mono',monospace;font-size:.75rem;padding:10px 12px;border-radius:10px;min-height:42px;
-}
-.tsel:focus{outline:none;border-color:var(--accent);}
-.tbtns{display:flex;gap:10px;width:100%;}
-.tbtn{
-  flex:1;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;
-  padding:12px;border-radius:10px;border:none;cursor:pointer;
-  text-transform:uppercase;letter-spacing:.5px;min-height:44px;transition:all .2s;
-}
-.tbtn.start{background:var(--accent3);color:#0d0f14;}
-.tbtn.pause{background:var(--accent);color:#0d0f14;}
-.tbtn.stop{background:var(--surface2);color:var(--muted2);border:1px solid var(--border);}
+/* ─── REV LEGEND ─── */
+.rev-legend { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 18px; margin-bottom:20px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:.6rem; color:var(--text2); box-shadow:var(--shadow); }
+.rl-ttl { font-size:.54rem; color:var(--muted); text-transform:uppercase; letter-spacing:.6px; margin-right:4px; }
+.rl-i { display:flex; align-items:center; gap:5px; }
+.rl-d { width:20px; height:20px; border-radius:4px; font-size:.55rem; font-weight:700; display:flex; align-items:center; justify-content:center; }
 
-/* LOG */
-.log-list{max-height:260px;overflow-y:auto;}
-.log-entry{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--border);font-size:.65rem;}
-.lt{color:var(--muted);min-width:55px;flex-shrink:0;}
-.ln{color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.lc{font-size:.55rem;padding:2px 6px;border-radius:3px;background:rgba(255,255,255,.05);border:1px solid var(--border);color:var(--muted2);flex-shrink:0;}
-.ld{color:var(--accent);font-weight:500;flex-shrink:0;}
+/* ─── FILTER BAR ─── */
+.fbar { display:flex; align-items:center; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+.srch { flex:1; min-width:160px; max-width:260px; background:var(--surface); border:1px solid var(--border2); color:var(--text); font-family:'DM Mono',monospace; font-size:.7rem; padding:7px 12px; border-radius:7px; outline:none; transition:border-color .13s; }
+.srch:focus { border-color:var(--p5); }
+.srch::placeholder { color:var(--muted2); }
+.chip { font-family:'Syne',sans-serif; font-size:.58rem; font-weight:600; padding:5px 12px; border-radius:20px; border:1px solid var(--border2); background:var(--surface); color:var(--text2); cursor:pointer; text-transform:uppercase; letter-spacing:.4px; transition:all .12s; white-space:nowrap; }
+.chip:hover { background:var(--bg2); }
+.chip.ca  { background:var(--bg2); border-color:var(--border2); color:var(--text); }
+.chip.cp.ca { background:#fef3c7; border-color:#fbbf24; color:#92400e; }
+.chip.cr.ca { background:var(--p5l); border-color:var(--p5m); color:var(--p5); }
+.chip.cd.ca { background:#f0fdf4; border-color:#86efac; color:var(--green); }
 
-/* MODALS */
-.modal-overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.7);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  z-index:900;align-items:flex-end;justify-content:center;
-}
-.modal-overlay.open{display:flex;}
-.modal{
-  background:var(--surface);border:1px solid var(--border);
-  border-radius:20px 20px 0 0;width:100%;max-width:520px;
-  padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));
-  animation:su .25s ease;max-height:92vh;overflow-y:auto;
-}
-@media(min-width:600px){.modal-overlay{align-items:center;}.modal{border-radius:16px;max-width:480px;padding:28px;}}
-@keyframes su{from{transform:translateY(40px);opacity:0;}to{transform:none;opacity:1;}}
-.mhandle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 16px;}
-@media(min-width:600px){.mhandle{display:none;}}
-.mtitle{font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;margin-bottom:18px;}
-.mactions{display:flex;gap:10px;margin-top:20px;}
-.btn{
-  flex:1;font-family:'Syne',sans-serif;font-size:.78rem;font-weight:600;
-  padding:12px;border-radius:10px;cursor:pointer;border:none;
-  transition:all .2s;min-height:44px;
-}
-.btn-p{background:var(--accent);color:#0d0f14;}
-.btn-p:active{background:#f0c028;}
-.btn-g{background:none;border:1px solid var(--border);color:var(--muted2);}
-.btn-g:active{border-color:var(--muted2);color:var(--text);}
-.narea{
-  width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);
-  font-family:'DM Mono',monospace;font-size:.75rem;padding:12px;
-  border-radius:8px;resize:vertical;min-height:80px;line-height:1.6;
-}
-.narea:focus{outline:none;border-color:var(--accent);}
+/* ─── SECTION WRAPPER ─── */
+.sec-wrap { background:var(--surface); border:1px solid var(--border); border-radius:10px; margin-bottom:10px; overflow:hidden; box-shadow:var(--shadow); }
+.sec-hdr { display:flex; align-items:center; gap:10px; padding:11px 16px; cursor:pointer; user-select:none; transition:background .12s; }
+.sec-hdr:hover { background:var(--bg2); }
+.sec-hdr.open { border-bottom:1px solid var(--border); }
+.sec-arrow { font-size:.65rem; color:var(--muted); transition:transform .18s; flex-shrink:0; }
+.sec-arrow.open { transform:rotate(90deg); }
+.sec-title { font-family:'Syne',sans-serif; font-size:.78rem; font-weight:700; color:var(--text2); }
+.sec-chip { font-size:.53rem; padding:2px 8px; border-radius:10px; background:var(--bg2); color:var(--muted); border:1px solid var(--border); }
+.sec-chip.g { background:#f0fdf4; border-color:#86efac; color:var(--green); }
+.sec-pct { margin-left:auto; font-size:.62rem; color:var(--text2); }
+.sec-pct strong { color:var(--text); }
 
-/* EMPTY */
-.empty{text-align:center;padding:32px 16px;font-size:.72rem;color:var(--muted);}
-.empty .big{font-size:2rem;margin-bottom:8px;}
+/* ─── TOPIC TABLE ─── */
+.t-wrap { overflow-x:auto; }
+.t-table { width:100%; border-collapse:collapse; }
+.t-table thead th { font-size:.54rem; text-transform:uppercase; letter-spacing:.8px; color:var(--muted); text-align:left; padding:8px 12px; border-bottom:1px solid var(--border); background:var(--surface2); font-weight:500; white-space:nowrap; }
+.t-table tbody tr { transition:background .1s; }
+.t-table tbody tr:hover { background:var(--bg2); }
+.t-table td { padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.t-table tbody tr:last-child td { border-bottom:none; }
 
-/* DESKTOP OVERRIDES ≥ 860px */
-@media(min-width:860px){
-  .mob-only{display:none!important;}
-  .desk-only{display:block!important;}
-  .stat-grid{grid-template-columns:repeat(4,1fr);}
-  .papers-row{display:grid!important;grid-template-columns:1fr 1fr;gap:16px;}
-  .papers-row .paper-card{margin-bottom:0;}
-  .analysis-row{display:grid!important;grid-template-columns:1fr 1fr;gap:14px;}
-  .analysis-row .acard{margin-bottom:0;}
-  .sched-grid{grid-template-columns:260px 1fr;}
-  .tcard-timer{flex-direction:row;flex-wrap:wrap;padding:20px;}
-  .tdisplay{font-size:2.4rem;}
-  .tbtns{width:auto;}
-  .tbtn{flex:none;padding:10px 18px;}
-  .tsel-wrap{width:220px;}
-  /* desktop table */
-  .topic-table{width:100%;border-collapse:collapse;}
-  .topic-table th{
-    font-size:.6rem;text-transform:uppercase;letter-spacing:.8px;
-    color:var(--muted);text-align:left;padding:8px 12px;
-    border-bottom:1px solid var(--border);font-weight:500;
-  }
-  .topic-table td{padding:10px 12px;border-bottom:1px solid rgba(37,42,56,.5);vertical-align:middle;}
-  .topic-row:hover td{background:rgba(255,255,255,.02);}
-  .tname{font-size:.78rem;color:var(--text);}
-  .tname small{display:block;font-size:.6rem;color:var(--muted);margin-top:2px;}
-  .mprog{display:flex;align-items:center;gap:8px;}
-  .mbar{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden;min-width:60px;}
-  .mfill{height:100%;border-radius:2px;transition:width .3s;}
-  .mpct{font-size:.65rem;color:var(--muted2);min-width:28px;text-align:right;}
-  .tinp{
-    background:var(--surface2);border:1px solid var(--border);color:var(--text);
-    font-family:'DM Mono',monospace;font-size:.7rem;padding:4px 8px;
-    border-radius:4px;width:52px;text-align:center;
-  }
-  .tinp:focus{outline:none;border-color:var(--accent);}
-  .abtn{
-    width:28px;height:28px;border-radius:4px;border:1px solid var(--border);
-    background:none;color:var(--muted);cursor:pointer;font-size:.75rem;
-    display:inline-flex;align-items:center;justify-content:center;transition:all .15s;
-  }
-  .abtn:hover{border-color:var(--accent);color:var(--accent);background:rgba(245,200,66,.08);}
-  .abtn.del:hover{border-color:var(--danger);color:var(--danger);background:rgba(239,68,68,.08);}
+/* tick */
+.tc { width:34px; text-align:center; }
+.tick { width:20px; height:20px; border-radius:5px; border:1.5px solid var(--border2); background:var(--surface); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition:all .13s; }
+.tick:hover { border-color:var(--p6); }
+.tick.on { background:var(--p6); border-color:var(--p6); }
+.tick.on::after { content:'✓'; font-size:.65rem; color:#fff; font-weight:700; }
+
+/* topic name */
+.tnc { min-width:200px; max-width:310px; }
+.tn { font-size:.73rem; color:var(--text); line-height:1.4; }
+.tn.cross { text-decoration:line-through; color:var(--muted); }
+.tch { font-size:.57rem; color:var(--muted); margin-top:1px; }
+.pri { display:inline-block; font-size:.5rem; padding:1px 5px; border-radius:3px; text-transform:uppercase; letter-spacing:.5px; font-weight:600; margin-left:5px; vertical-align:middle; }
+.ph { background:#fee2e2; color:#b91c1c; }
+.pm { background:#fef3c7; color:#92400e; }
+.pl { background:var(--bg2); color:var(--muted); }
+
+/* study tag */
+.stc { width:105px; text-align:center; }
+.stag { font-size:.6rem; padding:4px 10px; border-radius:20px; cursor:pointer; border:1px solid; font-family:'DM Mono',monospace; transition:all .13s; display:inline-block; }
+.stag.yes { background:#f0fdf4; border-color:#86efac; color:var(--green); }
+.stag.no  { background:var(--surface); border-color:var(--border2); color:var(--muted); }
+.stag.no:hover { border-color:var(--p6); color:var(--p6); }
+
+/* revision dots */
+.rvc { width:176px; }
+.rv-dots { display:flex; gap:4px; }
+.rdot {
+  width:28px; height:28px; border-radius:6px;
+  border:1.5px solid var(--border2); background:var(--surface);
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  font-family:'Syne',sans-serif; font-weight:700; font-size:.62rem;
+  color:var(--muted2); transition:all .13s;
 }
-@media(max-width:859px){
-  .mob-only{display:block;}
-  .desk-only{display:none!important;}
-  .papers-row{display:block;}
-  .analysis-row{display:block;}
-  .sched-grid{grid-template-columns:1fr;}
-}
-.priority-high{color:#f87171;}
-.priority-med{color:var(--accent);}
-.priority-low{color:var(--muted2);}
+.rdot:hover:not(:disabled) { border-color:var(--p5m); color:var(--p5); background:var(--p5l); }
+.rdot.v1.on { background:var(--rv1-bg); border-color:var(--rv1-bd); color:var(--rv1-tx); }
+.rdot.v2.on { background:var(--rv2-bg); border-color:var(--rv2-bd); color:var(--rv2-tx); }
+.rdot.v3.on { background:var(--rv3-bg); border-color:var(--rv3-bd); color:var(--rv3-tx); }
+.rdot.v4.on { background:var(--rv4-bg); border-color:var(--rv4-bd); color:var(--rv4-tx); }
+.rdot.v5.on { background:var(--rv5-bg); border-color:var(--rv5-bd); color:var(--rv5-tx); }
+.rdot:disabled { opacity:.3; cursor:not-allowed; }
+
+/* hours */
+.hrc { width:100px; }
+.hrs-bar { height:4px; background:var(--bg2); border-radius:2px; overflow:hidden; margin-top:3px; border:1px solid var(--border); }
+.hrs-fill { height:100%; border-radius:2px; transition:width .3s; }
+.hrs-txt { font-size:.6rem; color:var(--muted); }
+
+/* notes */
+.ntc { max-width:200px; }
+.note-txt { font-size:.6rem; color:var(--muted); max-width:190px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; }
+.note-txt:hover { color:var(--p5); }
+.note-add { font-size:.6rem; color:var(--muted2); border:1px dashed var(--border2); border-radius:4px; padding:2px 8px; cursor:pointer; transition:all .13s; display:inline-block; }
+.note-add:hover { border-color:var(--p5); color:var(--p5); }
+
+/* del btn */
+.delbtn { width:24px; height:24px; border-radius:5px; border:1px solid var(--border); background:none; color:var(--muted2); cursor:pointer; font-size:.7rem; display:inline-flex; align-items:center; justify-content:center; transition:all .12s; }
+.delbtn:hover { border-color:#fca5a5; color:var(--red); background:#fef2f2; }
+
+/* ─── MATRIX ─── */
+.mx-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; margin-bottom:16px; overflow:hidden; box-shadow:var(--shadow); }
+.mx-hdr { padding:13px 18px; font-family:'Syne',sans-serif; font-size:.75rem; font-weight:700; border-bottom:1px solid var(--border); background:var(--surface2); }
+.mx-table { width:100%; border-collapse:collapse; font-size:.65rem; }
+.mx-table th { font-size:.54rem; text-transform:uppercase; letter-spacing:.7px; color:var(--muted); padding:7px 10px; border-bottom:1px solid var(--border); background:var(--surface2); text-align:left; white-space:nowrap; font-weight:500; }
+.mx-table td { padding:7px 10px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.mx-table tr:last-child td { border-bottom:none; }
+.mx-table tr:hover td { background:var(--bg2); }
+.mx-nm { color:var(--text); max-width:240px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mx-ch { font-size:.57rem; color:var(--muted); white-space:nowrap; }
+.mx-box { width:22px; height:22px; border-radius:4px; border:1px solid var(--border2); margin:0 auto; display:flex; align-items:center; justify-content:center; font-size:.58rem; font-weight:700; }
+.mx-s  { background:#f0fdf4; border-color:#86efac; color:var(--green); }
+.mx-r1 { background:var(--rv1-bg); border-color:var(--rv1-bd); color:var(--rv1-tx); }
+.mx-r2 { background:var(--rv2-bg); border-color:var(--rv2-bd); color:var(--rv2-tx); }
+.mx-r3 { background:var(--rv3-bg); border-color:var(--rv3-bd); color:var(--rv3-tx); }
+.mx-r4 { background:var(--rv4-bg); border-color:var(--rv4-bd); color:var(--rv4-tx); }
+.mx-r5 { background:var(--rv5-bg); border-color:var(--rv5-bd); color:var(--rv5-tx); }
+.mx-em { color:var(--muted2); }
+.mx-lk { opacity:.28; }
+
+/* ─── EMPTY ─── */
+.empty { text-align:center; padding:36px; color:var(--muted); }
+.empty .ei { font-size:2rem; margin-bottom:8px; }
+.empty p { font-size:.7rem; }
+
+/* ─── MODAL ─── */
+.overlay { display:none; position:fixed; inset:0; background:rgba(20,25,50,.3); backdrop-filter:blur(3px); z-index:999; align-items:center; justify-content:center; }
+.overlay.open { display:flex; }
+.modal { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:26px; width:500px; max-width:96vw; max-height:90vh; overflow-y:auto; box-shadow:var(--shadow-md); animation:mi .15s ease; }
+@keyframes mi { from{transform:scale(.96);opacity:0} to{transform:scale(1);opacity:1} }
+.mtitle { font-family:'Syne',sans-serif; font-size:.95rem; font-weight:700; margin-bottom:18px; }
+.fg { margin-bottom:13px; }
+.fl { display:block; font-size:.57rem; color:var(--text2); text-transform:uppercase; letter-spacing:.8px; margin-bottom:5px; }
+.fi, .fsel, .fta { width:100%; background:var(--bg2); border:1px solid var(--border2); color:var(--text); font-family:'DM Mono',monospace; font-size:.73rem; padding:8px 11px; border-radius:6px; outline:none; transition:border-color .13s; }
+.fi:focus, .fsel:focus, .fta:focus { border-color:var(--p5); }
+.fsel option { background:var(--surface); }
+.fta { resize:vertical; min-height:70px; line-height:1.5; }
+.frow { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.mfoot { display:flex; gap:8px; justify-content:flex-end; margin-top:18px; }
+
+/* ─── TOAST ─── */
+.toast { position:fixed; bottom:22px; right:22px; background:var(--text); color:var(--bg); border-radius:8px; padding:10px 18px; font-size:.7rem; z-index:9999; opacity:0; transform:translateY(6px); transition:all .2s; pointer-events:none; }
+.toast.show { opacity:1; transform:none; }
 </style>
 </head>
 <body>
 
-<header>
-  <div class="hdr">
-    <div class="logo">CA <span>INTER</span></div>
-    <div class="hdr-pills">
-      <div class="pill" id="current-date">—</div>
-      <div class="pill" id="exam-countdown">📅 Set date</div>
-    </div>
+<!-- ═══════════ TOPBAR ═══════════ -->
+<header class="topbar">
+  <div class="logo">
+    <div class="logo-mark">CA</div>
+    <div class="logo-text">Inter <span>Study &amp; Revision Tracker</span></div>
+  </div>
+  <div class="tb-right">
+    <input type="date" class="date-inp" id="exam-inp" title="Set exam date" onchange="setExam(this.value)">
+    <div class="tb-pill exam" id="exam-pill">📅 Set exam date</div>
+    <div class="tb-clock" id="clock">--:--:--</div>
   </div>
 </header>
 
-<div class="main">
+<div class="shell">
 
-<!-- OVERVIEW -->
-<div class="tab-panel active" id="tab-overview">
-  <div class="stat-grid">
-    <div class="stat-card c1"><div class="stat-lbl">Progress</div><div class="stat-val" id="stat-overall">—%</div><div class="stat-sub">Both papers</div></div>
-    <div class="stat-card c2"><div class="stat-lbl">Studied</div><div class="stat-val" id="stat-hours">0h</div><div class="stat-sub">Total logged</div></div>
-    <div class="stat-card c3"><div class="stat-lbl">Done</div><div class="stat-val" id="stat-done">0</div><div class="stat-sub" id="stat-done-sub">of 0 topics</div></div>
-    <div class="stat-card c4"><div class="stat-lbl">Remaining</div><div class="stat-val" id="stat-remaining">—h</div><div class="stat-sub">Est. to finish</div></div>
-  </div>
-  <div class="papers-row">
-    <div class="paper-card">
-      <div class="pc-header"><div><div class="paper-title">Auditing &amp; Assurance</div><div class="paper-sub">Paper 5 · 100 Marks</div></div><span class="paper-tag p5">P5</span></div>
-      <div class="pbar"><div class="pbar-fill p5-fill" id="p5-bar" style="width:0%"></div></div>
-      <div class="pstats"><div><strong id="p5-done">0</strong> done</div><div><strong id="p5-ip">0</strong> active</div><div><strong id="p5-ns">0</strong> pending</div><div><strong id="p5-pct">0%</strong></div></div>
-    </div>
-    <div class="paper-card">
-      <div class="pc-header"><div><div class="paper-title">FM &amp; Strategic Mgmt</div><div class="paper-sub">Paper 6 · 100 Marks</div></div><span class="paper-tag p6">P6</span></div>
-      <div class="pbar"><div class="pbar-fill p6-fill" id="p6-bar" style="width:0%"></div></div>
-      <div class="pstats"><div><strong id="p6-done">0</strong> done</div><div><strong id="p6-ip">0</strong> active</div><div><strong id="p6-ns">0</strong> pending</div><div><strong id="p6-pct">0%</strong></div></div>
-    </div>
-  </div>
-  <div class="analysis-row">
-    <div class="acard"><div class="atitle">Time Analysis — P5</div><div class="tbar-list" id="p5-time-analysis"></div></div>
-    <div class="acard"><div class="atitle">Time Analysis — P6</div><div class="tbar-list" id="p6-time-analysis"></div></div>
-  </div>
-  <div class="acard"><div class="atitle">Recent Study Log</div><div class="log-list" id="study-log-display"><div class="empty"><div class="big">⏱</div>No sessions yet. Use the Timer tab!</div></div></div>
-</div>
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <nav class="sidebar">
+    <div class="sb-lbl">Dashboard</div>
+    <button class="sb-btn active" id="nav-overview" onclick="go('overview',this)">
+      <span class="sb-icon">📊</span> Overview
+    </button>
 
-<!-- PAPER 5 -->
-<div class="tab-panel" id="tab-paper5">
-  <div class="topic-hdr">
-    <div class="paper-tag p5">P5</div>
-    <div class="topic-title" style="color:var(--p5)">Auditing &amp; Assurance</div>
-    <span class="tcnt" id="p5-topic-count">0 topics</span>
-    <button class="add-btn" onclick="openAddTopic('p5')">+ Add</button>
-  </div>
-  <div class="filter-bar" id="p5-fbar">
-    <button class="fchip active" onclick="setFilter('p5','all',this)">All</button>
-    <button class="fchip" onclick="setFilter('p5','not-started',this)">Pending</button>
-    <button class="fchip fc-ip" onclick="setFilter('p5','in-progress',this)">Active</button>
-    <button class="fchip fc-rev" onclick="setFilter('p5','revision',this)">Revision</button>
-    <button class="fchip fc-done" onclick="setFilter('p5','done',this)">Done ✓</button>
-  </div>
-  <div class="mob-only" id="p5-cards"></div>
-  <div class="desk-only">
-    <table class="topic-table"><thead><tr><th>Topic</th><th>Status</th><th>Progress</th><th>Est.Hrs</th><th>Done Hrs</th><th>Remaining</th><th>Priority</th><th>Notes</th><th></th></tr></thead>
-    <tbody id="p5-topic-tbody"></tbody></table>
-  </div>
-</div>
+    <div class="sb-lbl">Paper 5 — Auditing</div>
+    <button class="sb-btn" id="nav-p5-all" onclick="go('p5-all',this)">
+      <span class="sb-icon">📋</span> All Topics
+      <span class="sb-badge" id="nb-p5-all">—</span>
+    </button>
+    <button class="sb-btn" id="nav-p5-ns" onclick="go('p5-ns',this)">
+      <span class="sb-icon">⭕</span> Not Studied
+      <span class="sb-badge" id="nb-p5-ns">—</span>
+    </button>
+    <button class="sb-btn" id="nav-p5-rev" onclick="go('p5-rev',this)">
+      <span class="sb-icon">🔁</span> In Revision
+      <span class="sb-badge" id="nb-p5-rev">—</span>
+    </button>
 
-<!-- PAPER 6 -->
-<div class="tab-panel" id="tab-paper6">
-  <div class="topic-hdr">
-    <div class="paper-tag p6">P6</div>
-    <div class="topic-title" style="color:var(--p6)">FM &amp; Strategic Mgmt</div>
-    <span class="tcnt" id="p6-topic-count">0 topics</span>
-    <button class="add-btn" onclick="openAddTopic('p6')">+ Add</button>
-  </div>
-  <div class="filter-bar" id="p6-fbar">
-    <button class="fchip active" onclick="setFilter('p6','all',this)">All</button>
-    <button class="fchip" onclick="setFilter('p6','not-started',this)">Pending</button>
-    <button class="fchip fc-ip" onclick="setFilter('p6','in-progress',this)">Active</button>
-    <button class="fchip fc-rev" onclick="setFilter('p6','revision',this)">Revision</button>
-    <button class="fchip fc-done" onclick="setFilter('p6','done',this)">Done ✓</button>
-  </div>
-  <div class="mob-only" id="p6-cards"></div>
-  <div class="desk-only">
-    <table class="topic-table"><thead><tr><th>Topic</th><th>Status</th><th>Progress</th><th>Est.Hrs</th><th>Done Hrs</th><th>Remaining</th><th>Priority</th><th>Notes</th><th></th></tr></thead>
-    <tbody id="p6-topic-tbody"></tbody></table>
-  </div>
-</div>
+    <div class="sb-div"></div>
+    <div class="sb-lbl">Paper 6 — FM &amp; SM</div>
+    <button class="sb-btn p6n" id="nav-p6-all" onclick="go('p6-all',this)">
+      <span class="sb-icon">💹</span> All Topics
+      <span class="sb-badge" id="nb-p6-all">—</span>
+    </button>
+    <button class="sb-btn p6n" id="nav-p6-ns" onclick="go('p6-ns',this)">
+      <span class="sb-icon">⭕</span> Not Studied
+      <span class="sb-badge" id="nb-p6-ns">—</span>
+    </button>
+    <button class="sb-btn p6n" id="nav-p6-rev" onclick="go('p6-rev',this)">
+      <span class="sb-icon">🔁</span> In Revision
+      <span class="sb-badge" id="nb-p6-rev">—</span>
+    </button>
 
-<!-- SCHEDULE -->
-<div class="tab-panel" id="tab-schedule">
-  <div class="sched-grid">
-    <div class="scard">
-      <div class="stitle">Today's Plan <button class="add-btn" style="margin-left:0;padding:5px 12px;font-size:.62rem;" onclick="openAddSlot()">+ Add</button></div>
-      <div id="today-slots-list"></div>
-      <div class="sdivider">settings</div>
-      <div class="srow">
-        <div><label class="form-lbl">Exam Date</label><input type="date" class="finp" id="exam-date-input" onchange="saveExamDate()"></div>
-        <div><label class="form-lbl">Daily Target (h)</label><input type="number" class="finp" id="daily-target" value="6" min="1" max="16" onchange="saveDailyTarget()"></div>
+    <div class="sb-div"></div>
+    <div class="sb-lbl">Tools</div>
+    <button class="sb-btn gn" id="nav-matrix" onclick="go('matrix',this)">
+      <span class="sb-icon">🗂</span> Revision Matrix
+    </button>
+
+    <div class="sb-foot">
+      <div class="sf-ttl">Overall Progress</div>
+      <div class="sf-row"><span>Studied</span><strong id="sf-st">0/0</strong></div>
+      <div class="sf-row"><span>Mastered</span><strong id="sf-ma">0/0</strong></div>
+      <div class="sf-bar"><div class="sf-fill" id="sf-fill" style="width:0%"></div></div>
+      <div class="sf-row"><span>Hours Done</span><strong id="sf-hrs">0h</strong></div>
+      <div style="margin-top:12px">
+        <button class="btn btn-warn btn-sm" style="width:100%" onclick="doReset()">⚠ Reset All Progress</button>
       </div>
     </div>
-    <div class="scard">
-      <div class="stitle">Weekly View</div>
-      <div class="week-scroll">
-        <div class="week-hdr" id="week-header"></div>
-        <div class="week-grid" id="week-grid"></div>
+  </nav>
+
+  <!-- ═══════════ CONTENT ═══════════ -->
+  <main class="content">
+
+    <!-- ── OVERVIEW ── -->
+    <div class="page active" id="page-overview">
+      <div class="ph">
+        <div>
+          <div class="ph-title">Dashboard</div>
+          <div class="ph-sub">CA Inter · Paper 5 (Auditing) &amp; Paper 6 (FM &amp; SM) · Study + 5-round revision tracker</div>
+        </div>
+        <div class="ph-act">
+          <label class="tb-pill" style="font-size:.6rem">Daily target (hrs):
+            <input type="number" id="daily-tgt" value="6" min="1" max="18" style="width:40px;background:none;border:none;outline:none;font-family:'DM Mono';font-size:.6rem;color:var(--gold);font-weight:600" onchange="saveDailyTgt()">
+          </label>
+        </div>
       </div>
-      <button class="add-slot-btn" onclick="openAddSlot()">+ Add Study Session</button>
+
+      <div class="stat-grid">
+        <div class="stat-box s0"><div class="stat-lbl">Total Topics</div><div class="stat-val" id="ov-tot">0</div><div class="stat-hint">Both papers</div></div>
+        <div class="stat-box s1"><div class="stat-lbl">Studied</div><div class="stat-val" id="ov-st">0</div><div class="stat-hint">1st read ✓</div></div>
+        <div class="stat-box s2"><div class="stat-lbl">Mastered</div><div class="stat-val" id="ov-ma">0</div><div class="stat-hint">All 5 revisions</div></div>
+        <div class="stat-box s3"><div class="stat-lbl">Hrs Done</div><div class="stat-val" id="ov-hrs">0h</div><div class="stat-hint">of <span id="ov-hrs-tot">0h</span></div></div>
+        <div class="stat-box s4"><div class="stat-lbl">Score</div><div class="stat-val" id="ov-score">0%</div><div class="stat-hint">Study + revision</div></div>
+      </div>
+
+      <div class="exam-bar" id="exam-bar" style="display:none">
+        <span class="eb-lbl">Exam Countdown</span>
+        <div class="eb-track"><div class="eb-fill" id="eb-fill" style="width:0%"></div></div>
+        <span class="eb-count" id="eb-count">—</span>
+      </div>
+
+      <!-- daily analysis -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:14px;box-shadow:var(--shadow)">
+        <div style="font-family:'Syne',sans-serif;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">Study Plan Analysis</div>
+        <div id="daily-analysis" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
+      </div>
+
+      <!-- paper rings -->
+      <div class="ring-card">
+        <svg width="84" height="84" viewBox="0 0 84 84" style="flex-shrink:0">
+          <circle cx="42" cy="42" r="34" fill="none" stroke="#ede9fe" stroke-width="7"/>
+          <circle id="ring-p5" cx="42" cy="42" r="34" fill="none" stroke="var(--p5)" stroke-width="7" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6" transform="rotate(-90 42 42)" style="transition:stroke-dashoffset .5s"/>
+          <text x="42" y="47" text-anchor="middle" font-family="Syne" font-weight="800" font-size="13" fill="var(--text)" id="ring-p5-txt">0%</text>
+        </svg>
+        <div class="ring-info">
+          <div class="ring-title" style="color:var(--p5)">Paper 5 — Auditing &amp; Assurance</div>
+          <div class="ring-sub">100 Marks · Ch 1–10 · 26 topics</div>
+          <div class="ring-stats">
+            <div class="rs"><div class="rs-v" id="p5-st">0</div><div class="rs-l">Studied</div></div>
+            <div class="rs"><div class="rs-v" id="p5-rv">0</div><div class="rs-l">Revising</div></div>
+            <div class="rs"><div class="rs-v" id="p5-ma">0</div><div class="rs-l">Mastered</div></div>
+            <div class="rs"><div class="rs-v" id="p5-hr">0h</div><div class="rs-l">Done</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ring-card">
+        <svg width="84" height="84" viewBox="0 0 84 84" style="flex-shrink:0">
+          <circle cx="42" cy="42" r="34" fill="none" stroke="#ccfbf1" stroke-width="7"/>
+          <circle id="ring-p6" cx="42" cy="42" r="34" fill="none" stroke="var(--p6)" stroke-width="7" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6" transform="rotate(-90 42 42)" style="transition:stroke-dashoffset .5s"/>
+          <text x="42" y="47" text-anchor="middle" font-family="Syne" font-weight="800" font-size="13" fill="var(--text)" id="ring-p6-txt">0%</text>
+        </svg>
+        <div class="ring-info">
+          <div class="ring-title" style="color:var(--p6)">Paper 6 — Financial Mgmt &amp; Strategic Mgmt</div>
+          <div class="ring-sub">100 Marks · FM (60) + SM (40) · 28 topics</div>
+          <div class="ring-stats">
+            <div class="rs"><div class="rs-v" id="p6-st">0</div><div class="rs-l">Studied</div></div>
+            <div class="rs"><div class="rs-v" id="p6-rv">0</div><div class="rs-l">Revising</div></div>
+            <div class="rs"><div class="rs-v" id="p6-ma">0</div><div class="rs-l">Mastered</div></div>
+            <div class="rs"><div class="rs-v" id="p6-hr">0h</div><div class="rs-l">Done</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rev-legend">
+        <span class="rl-ttl">Revision key:</span>
+        <div class="rl-i"><div class="rl-d" style="background:var(--rv1-bg);border:1px solid var(--rv1-bd);color:var(--rv1-tx)">1</div>Rev 1</div>
+        <div class="rl-i"><div class="rl-d" style="background:var(--rv2-bg);border:1px solid var(--rv2-bd);color:var(--rv2-tx)">2</div>Rev 2</div>
+        <div class="rl-i"><div class="rl-d" style="background:var(--rv3-bg);border:1px solid var(--rv3-bd);color:var(--rv3-tx)">3</div>Rev 3</div>
+        <div class="rl-i"><div class="rl-d" style="background:var(--rv4-bg);border:1px solid var(--rv4-bd);color:var(--rv4-tx)">4</div>Rev 4</div>
+        <div class="rl-i"><div class="rl-d" style="background:var(--rv5-bg);border:1px solid var(--rv5-bd);color:var(--rv5-tx)">5</div>Rev 5 = Mastered</div>
+        <div class="rl-i" style="margin-left:auto"><div class="rl-d" style="background:var(--bg2);border:1px solid var(--border);color:var(--muted2)">—</div>Locked</div>
+      </div>
     </div>
-  </div>
+
+    <!-- ── P5 ALL ── -->
+    <div class="page" id="page-p5-all">
+      <div class="ph">
+        <div><div class="ph-title" style="color:var(--p5)">Paper 5 — Auditing &amp; Assurance</div>
+          <div class="ph-sub">All 26 topics · tick Studied → unlock 5 sequential revision rounds</div></div>
+        <div class="ph-act">
+          <span class="sb-badge" style="padding:4px 10px;font-size:.62rem" id="cnt-p5-all">26 topics</span>
+          <button class="btn btn-ghost btn-sm" onclick="openAdd('p5')">+ Add Topic</button>
+        </div>
+      </div>
+      <div class="fbar">
+        <input class="srch" placeholder="Search topics…" id="srch-p5-all" oninput="setSearch('p5-all',this.value)">
+        <button class="chip ca" onclick="setChip(this,'p5-all','all')">All</button>
+        <button class="chip cp" onclick="setChip(this,'p5-all','ns')">Not Studied</button>
+        <button class="chip cr" onclick="setChip(this,'p5-all','rv')">In Revision</button>
+        <button class="chip cd" onclick="setChip(this,'p5-all','ma')">Mastered</button>
+      </div>
+      <div id="body-p5-all"></div>
+    </div>
+
+    <!-- ── P5 NOT STUDIED ── -->
+    <div class="page" id="page-p5-ns">
+      <div class="ph">
+        <div><div class="ph-title" style="color:var(--p5)">P5 — Not Yet Studied</div>
+          <div class="ph-sub">Topics pending first read</div></div>
+        <div class="ph-act"><span class="sb-badge" style="padding:4px 10px;font-size:.62rem" id="cnt-p5-ns">—</span></div>
+      </div>
+      <div id="body-p5-ns"></div>
+    </div>
+
+    <!-- ── P5 IN REVISION ── -->
+    <div class="page" id="page-p5-rev">
+      <div class="ph">
+        <div><div class="ph-title" style="color:var(--p5)">P5 — In Revision</div>
+          <div class="ph-sub">Studied topics, working through rounds 1–5</div></div>
+        <div class="ph-act"><span class="sb-badge" style="padding:4px 10px;font-size:.62rem" id="cnt-p5-rev">—</span></div>
+      </div>
+      <div id="body-p5-rev"></div>
+    </div>
+
+    <!-- ── P6 ALL ── -->
+    <div class="page" id="page-p6-all">
+      <div class="ph">
+        <div><div class="ph-title" style="color:var(--p6)">Paper 6 — Financial Mgmt &amp; Strategic Mgmt</div>
+          <div class="ph-sub">All 28 topics · FM (60 marks) + SM (40 marks)</div></div>
+        <div class="ph-act">
+          <span class="sb-badge" style="padding:4px 10px;font-size:.62rem" id="cnt-p6-all">28 topics</span>
+          <button class="btn btn-ghost btn-sm" onclick="openAdd('p6')">+ Add Topic</button>
+        </div>
+      </div>
+      <div class="fbar">
+        <input class="srch" placeholder="Search topics…" id="srch-p6-all" oninput="setSearch('p6-all',this.value)">
+        <button class="chip ca" onclick="setChip(this,'p6-all','all')">All</button>
+        <button class="chip cp" onclick="setChip(this,'p6-all','ns')">Not Studied</button>
+        <button class="chip cr" onclick="setChip(this,'p6-all','rv')">In Revision</button>
+        <button class="chip cd" onclick="setChip(this,'p6-all','ma')">Mastered</button>
+      </div>
+      <div id="body-p6-all"></div>
+    </div>
+
+    <!-- ── P6 NOT STUDIED ── -->
+    <div class="page" id="page-p6-ns">
+      <div class="ph">
+        <div><div class="ph-title" style="color:var(--p6)">P6 — Not Yet Studied</div>
+          <div class="ph-sub">Topics pending first read</div></div>
+        <div class="ph-act"><span class="sb-badge" style="padding:4px 10px;font-size:.62rem" id="cnt-p6-ns">—</span></div>
+      </div>
+      <div id="body-p6-ns"></div>
+    </div>
+
+    <!-- ── P6 IN REVISION ── -->
+    <div class="page" id="page-p6-rev">
+      <div class="ph">
+        <div><div class="ph-title" style="color:var(--p6)">P6 — In Revision</div>
+          <div class="ph-sub">Studied topics, working through rounds 1–5</div></div>
+        <div class="ph-act"><span class="sb-badge" style="padding:4px 10px;font-size:.62rem" id="cnt-p6-rev">—</span></div>
+      </div>
+      <div id="body-p6-rev"></div>
+    </div>
+
+    <!-- ── MATRIX ── -->
+    <div class="page" id="page-matrix">
+      <div class="ph">
+        <div><div class="ph-title">Revision Matrix</div>
+          <div class="ph-sub">All 54 topics × Studied + 5 revision rounds — complete bird's-eye view</div></div>
+      </div>
+      <div class="mx-card">
+        <div class="mx-hdr" style="color:var(--p5)">📋 Paper 5 — Auditing &amp; Assurance</div>
+        <div class="t-wrap">
+          <table class="mx-table">
+            <thead><tr><th style="width:38%">Topic</th><th>Chapter</th><th style="text-align:center">Studied</th>
+              <th style="text-align:center">Rev 1</th><th style="text-align:center">Rev 2</th>
+              <th style="text-align:center">Rev 3</th><th style="text-align:center">Rev 4</th><th style="text-align:center">Rev 5</th>
+            </tr></thead>
+            <tbody id="mx-p5"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="mx-card">
+        <div class="mx-hdr" style="color:var(--p6)">💹 Paper 6 — FM &amp; Strategic Mgmt</div>
+        <div class="t-wrap">
+          <table class="mx-table">
+            <thead><tr><th style="width:38%">Topic</th><th>Chapter</th><th style="text-align:center">Studied</th>
+              <th style="text-align:center">Rev 1</th><th style="text-align:center">Rev 2</th>
+              <th style="text-align:center">Rev 3</th><th style="text-align:center">Rev 4</th><th style="text-align:center">Rev 5</th>
+            </tr></thead>
+            <tbody id="mx-p6"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
 </div>
 
-<!-- TIMER -->
-<div class="tab-panel" id="tab-timer">
-  <div class="tcard-timer">
-    <div style="text-align:center">
-      <div style="font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Active Session</div>
-      <div class="tdisplay" id="timer-display">00:00:00</div>
-    </div>
-    <div class="ttopic">Studying: <span id="timer-active-topic">—</span></div>
-    <div class="tsel-wrap">
-      <select class="tsel" id="timer-topic-select"><option value="">— Select Topic —</option></select>
-    </div>
-    <div class="tbtns">
-      <button class="tbtn start" id="timer-start-btn" onclick="timerStart()">▶ Start</button>
-      <button class="tbtn pause" id="timer-pause-btn" onclick="timerPause()" style="display:none">⏸ Pause</button>
-      <button class="tbtn stop" onclick="timerStop()">■ Log</button>
-    </div>
-  </div>
-  <div class="acard"><div class="atitle">Session History</div><div class="log-list" id="full-session-log"><div class="empty"><div class="big">📋</div>No sessions logged yet.</div></div></div>
-</div>
-
-</div><!-- /main -->
-
-<!-- BOTTOM NAV -->
-<nav class="bnav">
-  <button class="nb active" id="nav-overview" onclick="switchTab('overview',this)"><span class="nb-icon">📊</span><span class="nb-lbl">Home</span></button>
-  <button class="nb p5" id="nav-paper5" onclick="switchTab('paper5',this)"><span class="nb-icon">📋</span><span class="nb-lbl">Paper 5</span></button>
-  <button class="nb p6" id="nav-paper6" onclick="switchTab('paper6',this)"><span class="nb-icon">💹</span><span class="nb-lbl">Paper 6</span></button>
-  <button class="nb" id="nav-schedule" onclick="switchTab('schedule',this)"><span class="nb-icon">🗓</span><span class="nb-lbl">Schedule</span></button>
-  <button class="nb" id="nav-timer" onclick="switchTab('timer',this)"><span class="nb-icon">⏱</span><span class="nb-lbl">Timer</span></button>
-</nav>
-
-<!-- ADD TOPIC MODAL -->
-<div class="modal-overlay" id="add-topic-modal">
+<!-- ADD / EDIT MODAL -->
+<div class="overlay" id="modal-add">
   <div class="modal">
-    <div class="mhandle"></div>
-    <div class="mtitle">Add New Topic</div>
-    <input type="hidden" id="modal-paper">
-    <div class="fgrp"><label class="form-lbl">Topic Name</label><input type="text" class="finp" id="modal-topic-name" placeholder="e.g. Capital Budgeting, SA 315…"></div>
-    <div class="fgrp"><label class="form-lbl">Chapter / Section</label><input type="text" class="finp" id="modal-chapter" placeholder="e.g. Chapter 2"></div>
-    <div class="frow" style="margin-bottom:12px">
-      <div><label class="form-lbl">Est. Hours</label><input type="number" class="finp" id="modal-est-hrs" value="4" min="0.5" step="0.5"></div>
-      <div><label class="form-lbl">Priority</label><select class="fsel" id="modal-priority"><option value="high">🔴 High</option><option value="medium" selected>🟡 Medium</option><option value="low">⚪ Low</option></select></div>
+    <div class="mtitle" id="modal-ttl">Add New Topic</div>
+    <input type="hidden" id="m-paper">
+    <input type="hidden" id="m-edit-id">
+    <div class="fg"><label class="fl">Topic Name *</label><input type="text" class="fi" id="m-name" placeholder="e.g. Audit Planning — SA 300"></div>
+    <div class="fg"><label class="fl">Chapter / Section</label><input type="text" class="fi" id="m-ch" placeholder="e.g. Ch 3 – Risk &amp; IC"></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Est. Hours</label><input type="number" class="fi" id="m-est" value="3" min="0.5" step="0.5"></div>
+      <div class="fg"><label class="fl">Priority</label>
+        <select class="fsel" id="m-pri">
+          <option value="high">🔴 High</option>
+          <option value="medium" selected>🟡 Medium</option>
+          <option value="low">⚪ Low</option>
+        </select>
+      </div>
     </div>
-    <div class="fgrp"><label class="form-lbl">Status</label><select class="fsel" id="modal-status"><option value="not-started">Not Started</option><option value="in-progress">In Progress</option><option value="revision">Revision</option><option value="done">Done ✓</option></select></div>
-    <div class="fgrp" style="margin-bottom:0"><label class="form-lbl">Notes</label><textarea class="narea" id="modal-notes" rows="2" placeholder="Key formulas, weak areas…"></textarea></div>
-    <div class="mactions"><button class="btn btn-g" onclick="closeModal('add-topic-modal')">Cancel</button><button class="btn btn-p" onclick="saveTopic()">Add Topic</button></div>
+    <div class="fg"><label class="fl">Notes / Key Points</label><textarea class="fta" id="m-notes" rows="3" placeholder="SA references, key concepts, formulas…"></textarea></div>
+    <div class="mfoot">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="modal-save-btn" onclick="saveModal()">Add Topic</button>
+    </div>
   </div>
 </div>
 
-<!-- SLOT MODAL -->
-<div class="modal-overlay" id="add-slot-modal">
+<!-- NOTES VIEW MODAL -->
+<div class="overlay" id="modal-notes">
   <div class="modal">
-    <div class="mhandle"></div>
-    <div class="mtitle">Schedule Session</div>
-    <div class="fgrp"><label class="form-lbl">Date</label><input type="date" class="finp" id="slot-date"></div>
-    <div class="frow" style="margin-bottom:12px">
-      <div><label class="form-lbl">Start</label><input type="time" class="finp" id="slot-start"></div>
-      <div><label class="form-lbl">End</label><input type="time" class="finp" id="slot-end"></div>
-    </div>
-    <div class="fgrp" style="margin-bottom:0"><label class="form-lbl">Topic</label><select class="fsel" id="slot-topic-select"></select></div>
-    <div class="mactions"><button class="btn btn-g" onclick="closeModal('add-slot-modal')">Cancel</button><button class="btn btn-p" onclick="saveSlot()">Schedule</button></div>
+    <div class="mtitle" id="notes-ttl">Notes</div>
+    <div id="notes-body" style="font-size:.73rem;color:var(--text2);line-height:1.7;white-space:pre-wrap;background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:14px;min-height:80px"></div>
+    <div class="mfoot"><button class="btn btn-ghost" onclick="closeModal()">Close</button></div>
   </div>
 </div>
 
-<!-- NOTES MODAL -->
-<div class="modal-overlay" id="notes-modal">
-  <div class="modal">
-    <div class="mhandle"></div>
-    <div class="mtitle" id="notes-modal-title">Notes</div>
-    <textarea class="narea" id="notes-modal-text" rows="7" style="min-height:140px"></textarea>
-    <div class="mactions"><button class="btn btn-g" onclick="closeModal('notes-modal')">Cancel</button><button class="btn btn-p" onclick="saveNotes()">Save</button></div>
-  </div>
-</div>
+<div class="toast" id="toast"></div>
 
 <script>
-/* DATA */
-const DEFAULT_P5=[
-  {name:"Nature, Objective & Scope of Audit",chapter:"Chapter 1",estHrs:3,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Auditing Concepts & Principles — SA 200",chapter:"Chapter 2",estHrs:4,doneHrs:0,status:"not-started",priority:"high",notes:""},
-  {name:"Documentation — SA 230",chapter:"Chapter 2",estHrs:2,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Audit Planning — SA 300",chapter:"Chapter 3",estHrs:3,doneHrs:0,status:"not-started",priority:"high",notes:""},
-  {name:"Risk Assessment — SA 315 & 330",chapter:"Chapter 3",estHrs:5,doneHrs:0,status:"not-started",priority:"high",notes:""},
-  {name:"Internal Control — SA 265 & 402",chapter:"Chapter 3",estHrs:4,doneHrs:0,status:"not-started",priority:"high",notes:""},
-  {name:"Audit Materiality — SA 320 & 450",chapter:"Chapter 3",estHrs:3,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Audit Evidence — SA 500–580",chapter:"Chapter 4",estHrs:7,doneHrs:0,status:"not-started",priority:"high",notes:""},
-  {name:"Audit Sampling — SA 530",chapter:"Chapter 4",estHrs:3,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Analytical Procedures — SA 520",chapter:"Chapter 4",estHrs:2,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Audit of Items of Financial Statements",chapter:"Chapter 5",estHrs:5,doneHrs:0,status:"not-started",priority:"high",notes:""},
-  {name:"Audit Conclusion & Reporting — SA 700–720",chapter:"Chapter 6",estHrs:5,doneHrs:0,status:"not-started",priority:"high",notes:""},
-  {name:"Audit of Banks & NBFCs",chapter:"Chapter 7",estHrs:4,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Audit of Different Entities",chapter:"Chapter 8",estHrs:3,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Company Audit & CARO 2020",chapter:"Chapter 9",estHrs:5,doneHrs:0,status:"not-started",priority:"high",notes:""},
-  {name:"Divisional Heads Report & Audit Committee",chapter:"Chapter 10",estHrs:2,doneHrs:0,status:"not-started",priority:"low",notes:""},
-  {name:"Professional Ethics & Independence",chapter:"Chapter 11",estHrs:3,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-];
-const DEFAULT_P6=[
-  {name:"Scope & Objectives of Financial Management",chapter:"FM – Ch 1",estHrs:2,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Capital Budgeting — NPV, IRR, Payback, PI",chapter:"FM – Ch 2",estHrs:7,doneHrs:0,status:"not-started",priority:"high",notes:""},
-  {name:"Cost of Capital — WACC, Kd, Ke, Kp",chapter:"FM – Ch 3",estHrs:6,doneHrs:0,status:"not-started",priority:"high",notes:""},
-  {name:"Capital Structure — Theories & Leverage",chapter:"FM – Ch 4",estHrs:5,doneHrs:0,status:"not-started",priority:"high",notes:""},
-  {name:"Dividend Decisions — Theories & Models",chapter:"FM – Ch 5",estHrs:4,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Working Capital Management",chapter:"FM – Ch 6",estHrs:6,doneHrs:0,status:"not-started",priority:"high",notes:""},
-  {name:"Management of Receivables & Payables",chapter:"FM – Ch 7",estHrs:3,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Management of Inventory & Cash",chapter:"FM – Ch 8",estHrs:3,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Financial Analysis — Ratio, Cash Flow",chapter:"FM – Ch 9",estHrs:5,doneHrs:0,status:"not-started",priority:"high",notes:""},
-  {name:"Sources of Finance — Long & Short Term",chapter:"FM – Ch 10",estHrs:3,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Introduction to Strategic Management",chapter:"SM – Ch 1",estHrs:2,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Strategic Analysis — External Environment",chapter:"SM – Ch 2",estHrs:3,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Strategic Analysis — Internal Environment",chapter:"SM – Ch 3",estHrs:3,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"SWOT, PESTLE & Porter's Five Forces",chapter:"SM – Ch 4",estHrs:4,doneHrs:0,status:"not-started",priority:"high",notes:""},
-  {name:"Strategic Choice & Generic Strategies",chapter:"SM – Ch 5",estHrs:3,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Strategy Implementation & BSC",chapter:"SM – Ch 6",estHrs:3,doneHrs:0,status:"not-started",priority:"medium",notes:""},
-  {name:"Business Level & Corporate Level Strategy",chapter:"SM – Ch 7",estHrs:3,doneHrs:0,status:"not-started",priority:"medium",notes:""},
+/* ═══════════════════════════════════════════════════
+   EXACT TOPIC DATA FROM Study_Tracker.html
+═══════════════════════════════════════════════════ */
+const SRC_P5 = [
+  {name:"Nature, Objective & Scope of Audit",              ch:"Ch 1 – Nature & Scope",  hrs:3,  pri:"medium", notes:"Meaning of auditing, objectives (primary & subsidiary), types of audit, distinction from accounting/investigation."},
+  {name:"Auditing Concepts & Principles — SA 200",         ch:"Ch 2 – Concepts",        hrs:3,  pri:"high",   notes:"Overall objectives of independent auditor; fundamental principles; professional skepticism & judgment."},
+  {name:"Quality Control — SA 220 & SQC 1",                ch:"Ch 2 – Concepts",        hrs:2,  pri:"medium", notes:"Quality control for audit of FS; firm-level & engagement-level quality control."},
+  {name:"Audit Documentation — SA 230",                    ch:"Ch 2 – Concepts",        hrs:2,  pri:"medium", notes:"Nature & purpose of audit documentation; assembly of final audit file; ownership."},
+  {name:"Audit Engagement — SA 210",                       ch:"Ch 2 – Concepts",        hrs:2,  pri:"medium", notes:"Agreeing terms; preconditions for audit; management responsibilities; engagement letter."},
+  {name:"Audit Planning & Strategy — SA 300",              ch:"Ch 3 – Risk & IC",       hrs:3,  pri:"high",   notes:"Planning an audit; overall audit strategy; audit plan; changes to planning decisions."},
+  {name:"Understanding Entity & Risk Assessment — SA 315", ch:"Ch 3 – Risk & IC",       hrs:5,  pri:"high",   notes:"Identifying & assessing RMM; inherent risk; control risk; detection risk; business risk."},
+  {name:"Addressing Assessed Risks — SA 330",              ch:"Ch 3 – Risk & IC",       hrs:3,  pri:"high",   notes:"Auditor responses; substantive procedures; tests of controls; combination approaches."},
+  {name:"Materiality — SA 320 & 450",                      ch:"Ch 3 – Risk & IC",       hrs:3,  pri:"high",   notes:"Determining overall materiality; performance materiality; misstatements & evaluation."},
+  {name:"Internal Control — SA 265 & SA 402",              ch:"Ch 3 – Risk & IC",       hrs:4,  pri:"high",   notes:"Communicating IC deficiencies; service organisations; COSO framework components."},
+  {name:"Audit Evidence — SA 500",                         ch:"Ch 4 – Evidence",        hrs:3,  pri:"high",   notes:"Sufficiency & appropriateness; sources of evidence; evaluation of evidence."},
+  {name:"Specific Evidence Procedures — SA 501–580",       ch:"Ch 4 – Evidence",        hrs:5,  pri:"high",   notes:"SA 501 inventory/litigation, SA 505 confirmations, SA 510 opening balances, SA 540 estimates, SA 550 related parties, SA 570 going concern, SA 580 written representations."},
+  {name:"Audit Sampling — SA 530",                         ch:"Ch 4 – Evidence",        hrs:3,  pri:"medium", notes:"Statistical vs non-statistical sampling; sample design; evaluation of results; projection of misstatements."},
+  {name:"Analytical Procedures — SA 520",                  ch:"Ch 4 – Evidence",        hrs:2,  pri:"medium", notes:"Using AP as substantive procedures near completion; investigating unusual fluctuations."},
+  {name:"Using Work of Others — SA 600, 610 & 620",        ch:"Ch 4 – Evidence",        hrs:3,  pri:"medium", notes:"Group audits SA 600; using IA work SA 610; using expert's work SA 620."},
+  {name:"Audit of Items of Financial Statements",          ch:"Ch 5 – FS Items",        hrs:6,  pri:"high",   notes:"Verification & vouching of fixed assets, investments, debtors, cash, liabilities; cut-off; purchases & sales cycles."},
+  {name:"Audit Reporting — SA 700, 705 & 706",             ch:"Ch 6 – Report",          hrs:4,  pri:"high",   notes:"Forming opinion; unmodified/modified opinions; emphasis of matter & other matter paragraphs."},
+  {name:"Key Audit Matters — SA 701",                      ch:"Ch 6 – Report",          hrs:2,  pri:"medium", notes:"Communicating KAMs; determining KAMs; basis for opinions."},
+  {name:"Comparative Info & Special Purpose — SA 710 & 800s",ch:"Ch 6 – Report",        hrs:2,  pri:"low",    notes:"Corresponding figures; comparative FS; audit of special purpose FS."},
+  {name:"Company Audit — Appointment & Rights of Auditor", ch:"Ch 7 – Company Audit",   hrs:4,  pri:"high",   notes:"Appointment under Companies Act 2013; rotation; removal; remuneration; rights, duties & liabilities."},
+  {name:"CARO 2020 — All Clauses",                         ch:"Ch 7 – Company Audit",   hrs:3,  pri:"high",   notes:"All clauses of CARO 2020 in detail; applicability; reporting requirements."},
+  {name:"Audit Committee & Corporate Governance",          ch:"Ch 7 – Company Audit",   hrs:2,  pri:"medium", notes:"Role of audit committee; composition; functions under Companies Act."},
+  {name:"Audit in Computerised / IT Environment",          ch:"Ch 8 – IT Audit",        hrs:3,  pri:"medium", notes:"IT general controls; application controls; CAATs; risks in IT environment; data analytics."},
+  {name:"Audit of Banks & NBFCs",                          ch:"Ch 9 – Special Audits",  hrs:4,  pri:"medium", notes:"Statutory audit of banks; RBI guidelines; LFAR; NPA classification; concurrent audit."},
+  {name:"Audit of Different Entities (LLP, Co-op, NGO, Govt)",ch:"Ch 9 – Special Audits",hrs:3,pri:"medium", notes:"Audit of LLPs, cooperative societies, NGOs, government companies, educational institutions."},
+  {name:"Professional Ethics — ICAI Code of Ethics",       ch:"Ch 10 – Ethics",         hrs:3,  pri:"high",   notes:"Fundamental principles; threats & safeguards; independence; professional misconduct under CA Act 1949."},
 ];
 
-function loadData(){return{
-  p5:JSON.parse(localStorage.getItem('ca_p5')||'null')||DEFAULT_P5.map((t,i)=>({...t,id:'p5_'+i})),
-  p6:JSON.parse(localStorage.getItem('ca_p6')||'null')||DEFAULT_P6.map((t,i)=>({...t,id:'p6_'+i})),
-  slots:JSON.parse(localStorage.getItem('ca_slots')||'[]'),
-  sessions:JSON.parse(localStorage.getItem('ca_sessions')||'[]'),
-};}
-function saveData(d){
-  localStorage.setItem('ca_p5',JSON.stringify(d.p5));
-  localStorage.setItem('ca_p6',JSON.stringify(d.p6));
-  localStorage.setItem('ca_slots',JSON.stringify(d.slots));
-  localStorage.setItem('ca_sessions',JSON.stringify(d.sessions));
+const SRC_P6 = [
+  /* FM */
+  {name:"Scope, Objectives & Functions of FM",                        ch:"FM – Ch 1", hrs:2,  pri:"medium", notes:"Role of CFO; profit vs wealth maximisation; agency problem; time value of money basics."},
+  {name:"Capital Budgeting — Payback, ARR, NPV, IRR, PI",            ch:"FM – Ch 2", hrs:5,  pri:"high",   notes:"Traditional & DCF methods; NPV vs IRR conflict; incremental cash flows; relevant costs."},
+  {name:"Capital Budgeting — Special Situations",                     ch:"FM – Ch 2", hrs:3,  pri:"high",   notes:"Replacement decisions; capital rationing; inflation in capital budgeting; EAC."},
+  {name:"Cost of Debt (Kd) & Preference Share (Kp)",                 ch:"FM – Ch 3", hrs:2,  pri:"high",   notes:"Pre-tax & post-tax Kd; YTM approach; irredeemable & redeemable preference shares."},
+  {name:"Cost of Equity (Ke) — CAPM & Dividend Model",               ch:"FM – Ch 3", hrs:3,  pri:"high",   notes:"Gordon's dividend growth model; CAPM (beta, SML); cost of retained earnings."},
+  {name:"WACC & Marginal Cost of Capital",                            ch:"FM – Ch 3", hrs:2,  pri:"high",   notes:"Book value vs market value weights; WACC computation; MCC schedule; break points."},
+  {name:"Capital Structure Theories",                                  ch:"FM – Ch 4", hrs:4,  pri:"high",   notes:"NI, NOI, Traditional, MM with & without taxes; trade-off theory; pecking order; optimal capital structure."},
+  {name:"Operating & Financial Leverage",                              ch:"FM – Ch 4", hrs:3,  pri:"high",   notes:"DOL, DFL, DCL; EBIT-EPS analysis; indifference point; effect on risk; break-even."},
+  {name:"Dividend Policy — Theories & Models",                        ch:"FM – Ch 5", hrs:4,  pri:"medium", notes:"MM irrelevance; Walter's model; Gordon's model; forms of dividends; buyback."},
+  {name:"Working Capital — Concepts & Estimation",                    ch:"FM – Ch 6", hrs:4,  pri:"high",   notes:"Gross vs net WC; factors affecting WC; operating cycle; estimation of WC requirement."},
+  {name:"Management of Inventory",                                     ch:"FM – Ch 6", hrs:3,  pri:"high",   notes:"EOQ model; reorder point; safety stock; ABC analysis; inventory ratios."},
+  {name:"Management of Receivables & Debtors",                        ch:"FM – Ch 6", hrs:3,  pri:"high",   notes:"Credit policy; credit terms; cash discount; collection period; ageing schedule; factoring."},
+  {name:"Management of Cash & Marketable Securities",                  ch:"FM – Ch 6", hrs:3,  pri:"medium", notes:"Motives for holding cash; Baumol model; Miller-Orr model; cash budget; float management."},
+  {name:"Sources of Finance — Short Term & WC",                       ch:"FM – Ch 7", hrs:3,  pri:"medium", notes:"Trade credit; bank finance CC, overdraft, bills; commercial paper; factoring; public deposits."},
+  {name:"Sources of Finance — Long Term",                              ch:"FM – Ch 7", hrs:3,  pri:"medium", notes:"Equity shares; preference shares; debentures; term loans; venture capital; angel funds."},
+  {name:"Financial Analysis — Ratio Analysis",                        ch:"FM – Ch 8", hrs:4,  pri:"high",   notes:"Liquidity, solvency, activity, profitability & market ratios; DuPont analysis; limitations."},
+  {name:"Financial Analysis — Cash Flow Statement",                   ch:"FM – Ch 8", hrs:3,  pri:"high",   notes:"Operating, investing & financing activities; direct vs indirect method; interpretation."},
+  /* SM */
+  {name:"Introduction to Strategic Management",                        ch:"SM – Ch 1", hrs:2,  pri:"medium", notes:"Concept of strategy; SM process; vision, mission & objectives; levels of strategy."},
+  {name:"External Environment — PESTLE & Porter's Five Forces",       ch:"SM – Ch 2", hrs:3,  pri:"high",   notes:"Macro environment PESTLE/STEEPLE; Porter's Five Forces; competitive dynamics; industry life cycle."},
+  {name:"Internal Environment — Resource & Capability",               ch:"SM – Ch 3", hrs:3,  pri:"medium", notes:"Resource-based view; value chain analysis; core competencies; VRIO framework; benchmarking."},
+  {name:"SWOT Analysis & Strategic Fit",                               ch:"SM – Ch 3", hrs:2,  pri:"high",   notes:"SWOT matrix; TOWS; strategic fit; gap analysis."},
+  {name:"Corporate Level Strategies",                                  ch:"SM – Ch 4", hrs:3,  pri:"high",   notes:"Stability; expansion (intensive, integrative, diversification); retrenchment; Ansoff matrix."},
+  {name:"Business Level Strategies — Porter's Generic",               ch:"SM – Ch 4", hrs:3,  pri:"high",   notes:"Cost leadership; differentiation; focus; stuck in the middle; Blue Ocean strategy."},
+  {name:"Strategic Alliances, M&A & Restructuring",                   ch:"SM – Ch 4", hrs:2,  pri:"medium", notes:"Types of alliances; JV; mergers & acquisitions; turnaround strategies; outsourcing."},
+  {name:"Strategy Implementation — Organisational Design",            ch:"SM – Ch 5", hrs:3,  pri:"medium", notes:"Structural choices; functional, divisional, matrix structures; McKinsey 7-S model."},
+  {name:"Strategy Implementation — Leadership & Culture",             ch:"SM – Ch 5", hrs:2,  pri:"medium", notes:"Role of leadership in strategy; change management; organisational culture."},
+  {name:"Strategic Evaluation & Balanced Scorecard",                  ch:"SM – Ch 6", hrs:3,  pri:"high",   notes:"Strategic control; BSC perspectives (financial, customer, internal, learning); KPIs; benchmarking."},
+  {name:"Digital Transformation, Innovation & Entrepreneurship",      ch:"SM – Ch 7", hrs:2,  pri:"medium", notes:"Digital disruption; business model innovation; startup ecosystems; design thinking; CSR."},
+];
+
+/* ═══════════════════════════════════════════════════
+   STATE MODEL
+   Each topic: { id, name, ch, hrs(est), doneHrs, pri, notes, studied, revs:[5 bools] }
+═══════════════════════════════════════════════════ */
+function mkT(src, prefix) {
+  return src.map((t, i) => ({
+    id: prefix + i,
+    name: t.name, ch: t.ch, hrs: t.hrs, doneHrs: 0,
+    pri: t.pri, notes: t.notes,
+    studied: false,
+    revs: [false,false,false,false,false],
+  }));
+}
+function load() {
+  return {
+    p5: JSON.parse(localStorage.getItem('srt_p5') || 'null') || mkT(SRC_P5,'p5_'),
+    p6: JSON.parse(localStorage.getItem('srt_p6') || 'null') || mkT(SRC_P6,'p6_'),
+  };
+}
+function save() {
+  localStorage.setItem('srt_p5', JSON.stringify(D.p5));
+  localStorage.setItem('srt_p6', JSON.stringify(D.p6));
+}
+let D = load();
+
+/* filter / search state */
+const chipSt = {'p5-all':'all','p6-all':'all'};
+const srchSt = {'p5-all':'','p6-all':''};
+const openSec = {};
+
+/* ═══ NAV ═══ */
+function go(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  (btn || document.getElementById('nav-'+id)).classList.add('active');
+  document.querySelector('.content').scrollTop = 0;
+  renderAll();
 }
 
-let appData=loadData();
-let filters={p5:'all',p6:'all'};
-let eNotesPaper=null,eNotesIdx=null;
-
-/* TABS */
-function switchTab(tab,btn){
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
-  (btn||document.getElementById('nav-'+tab)).classList.add('active');
-  if(tab==='schedule')renderSchedule();
-  if(tab==='timer')populateTimerSelect();
-  window.scrollTo(0,0);
+/* ═══ CLOCK / EXAM ═══ */
+setInterval(() => {
+  document.getElementById('clock').textContent =
+    new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}, 1000);
+function setExam(v) { localStorage.setItem('srt_exam',v); refreshExam(); }
+function refreshExam() {
+  const v = localStorage.getItem('srt_exam'); if(!v) return;
+  document.getElementById('exam-inp').value = v;
+  const diff = Math.ceil((new Date(v) - new Date()) / 86400000);
+  document.getElementById('exam-pill').textContent =
+    diff > 0 ? `⏳ ${diff} days to exam` : diff===0 ? '🎓 Today!' : '✅ Over';
+  const bar = document.getElementById('exam-bar'); bar.style.display='flex';
+  const pct = Math.max(0,Math.min(100,Math.round(((180-diff)/180)*100)));
+  document.getElementById('eb-fill').style.width = pct+'%';
+  document.getElementById('eb-count').textContent = diff>0?diff+' days left':'Exam Day!';
+}
+function saveDailyTgt() {
+  localStorage.setItem('srt_daily', document.getElementById('daily-tgt').value);
+  renderOverview();
 }
 
-/* DATE */
-function updateDate(){
-  const now=new Date();
-  document.getElementById('current-date').textContent=now.toLocaleDateString('en-IN',{day:'numeric',month:'short'});
-  const ex=localStorage.getItem('ca_exam_date');
-  if(ex){
-    const d=Math.ceil((new Date(ex)-now)/86400000);
-    document.getElementById('exam-countdown').textContent=d>0?`⏳ ${d}d left`:d===0?'🎓 Today!':'✅ Done';
-  }
+/* ═══ ACTIONS ═══ */
+function toggleStudied(paper, id) {
+  const t = D[paper].find(x=>x.id===id); if(!t) return;
+  t.studied = !t.studied;
+  if (!t.studied) t.revs=[false,false,false,false,false];
+  save(); renderAll();
+  toast(t.studied ? `✓ Studied: ${t.name.slice(0,32)}` : `↩ Unmarked: ${t.name.slice(0,30)}`);
 }
-function saveExamDate(){localStorage.setItem('ca_exam_date',document.getElementById('exam-date-input').value);updateDate();}
-function saveDailyTarget(){localStorage.setItem('ca_daily_target',document.getElementById('daily-target').value);}
-
-/* FILTER */
-function setFilter(paper,f,el){
-  filters[paper]=f;
-  document.getElementById(paper+'-fbar').querySelectorAll('.fchip').forEach(c=>c.classList.remove('active'));
-  el.classList.add('active');
-  renderTopics(paper);
+function toggleRev(paper, id, i) {
+  const t = D[paper].find(x=>x.id===id); if(!t||!t.studied) return;
+  if (i>0&&!t.revs[i-1]) { toast('⚠ Complete previous revision first!'); return; }
+  t.revs[i] = !t.revs[i];
+  if (!t.revs[i]) for(let j=i+1;j<5;j++) t.revs[j]=false;
+  save(); renderAll();
+  toast(t.revs[i]?`🔁 Rev ${i+1} done: ${t.name.slice(0,28)}`:`↩ Rev ${i+1} cleared`);
 }
-
-/* STATUS LABELS */
-const SL={'not-started':'Not Started','in-progress':'In Progress','revision':'Revision','done':'Done ✓'};
-const SC={'not-started':'s-ns','in-progress':'s-ip','revision':'s-rv','done':'s-dn'};
-
-/* RENDER TOPICS */
-function renderTopics(paper){
-  const topics=appData[paper];
-  const f=filters[paper]||'all';
-  const filtered=f==='all'?topics:topics.filter(t=>t.status===f);
-  document.getElementById(paper+'-topic-count').textContent=topics.length+' topics';
-  const fc=paper==='p5'?'#a78bfa':'#34d399';
-
-  // Mobile cards
-  const cardsEl=document.getElementById(paper+'-cards');
-  if(cardsEl){
-    if(!filtered.length){cardsEl.innerHTML='<div class="empty"><div class="big">🔍</div>No topics match this filter.</div>';return;}
-    cardsEl.innerHTML=filtered.map(t=>{
-      const i=topics.indexOf(t);
-      const rem=Math.max(0,t.estHrs-t.doneHrs);
-      const pct=t.estHrs>0?Math.min(100,Math.round((t.doneHrs/t.estHrs)*100)):0;
-      return `<div class="tcard status-${t.status}">
-        <div class="tc-top">
-          <div class="pdot ${t.priority||'low'}"></div>
-          <div class="tc-info"><div class="tc-name">${t.name}</div><div class="tc-ch">${t.chapter||''}</div></div>
-          <span class="sbadge ${SC[t.status]||'s-ns'}">${SL[t.status]||t.status}</span>
-        </div>
-        <div class="tc-prog">
-          <div class="prog-row"><span style="color:var(--muted2);font-size:.6rem">${pct}% complete</span><span>${rem===0?'✓ Done':rem+'h left'}</span></div>
-          <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${fc};border-radius:3px;transition:width .3s"></div></div>
-        </div>
-        <div class="tc-mid">
-          <div class="tcf"><div class="tcf-lbl">Est. Hrs</div><input type="number" class="tcf-inp" value="${t.estHrs}" min="0" step="0.5" onchange="updateEst('${paper}',${i},this.value)"></div>
-          <div class="tcf"><div class="tcf-lbl">Done Hrs</div><input type="number" class="tcf-inp" value="${t.doneHrs}" min="0" step="0.5" onchange="updateDone('${paper}',${i},this.value)"></div>
-          <div class="tcf"><div class="tcf-lbl">Remaining</div><div class="tcf-val" style="color:${rem===0?'var(--accent3)':'var(--accent4)'}">${rem===0?'✓':rem+'h'}</div></div>
-        </div>
-        <div class="tc-actions">
-          <select class="ssel" onchange="updateStatus('${paper}',${i},this.value)">
-            <option value="not-started"${t.status==='not-started'?' selected':''}>Not Started</option>
-            <option value="in-progress"${t.status==='in-progress'?' selected':''}>In Progress</option>
-            <option value="revision"${t.status==='revision'?' selected':''}>Revision</option>
-            <option value="done"${t.status==='done'?' selected':''}>Done ✓</option>
-          </select>
-          <button class="ibtn ${t.notes?'hn':''}" onclick="openNotes('${paper}',${i})">📝</button>
-          <button class="ibtn del" onclick="deleteTopic('${paper}',${i})">✕</button>
-        </div>
-      </div>`;
-    }).join('');
-  }
-
-  // Desktop table
-  const tbody=document.getElementById(paper+'-topic-tbody');
-  if(tbody){
-    tbody.innerHTML=filtered.map(t=>{
-      const i=topics.indexOf(t);
-      const rem=Math.max(0,t.estHrs-t.doneHrs);
-      const pct=t.estHrs>0?Math.min(100,Math.round((t.doneHrs/t.estHrs)*100)):0;
-      const ph=t.priority==='high'?'<span class="priority-high">●●●</span>':t.priority==='medium'?'<span class="priority-med">●●○</span>':'<span class="priority-low">●○○</span>';
-      return `<tr class="topic-row">
-        <td><div class="tname">${t.name}<small>${t.chapter||''}</small></div></td>
-        <td><select class="ssel" style="font-size:.6rem;padding:4px 6px;min-height:auto" onchange="updateStatus('${paper}',${i},this.value)">
-          <option value="not-started"${t.status==='not-started'?' selected':''}>Not Started</option>
-          <option value="in-progress"${t.status==='in-progress'?' selected':''}>In Progress</option>
-          <option value="revision"${t.status==='revision'?' selected':''}>Revision</option>
-          <option value="done"${t.status==='done'?' selected':''}>Done ✓</option>
-        </select></td>
-        <td><div class="mprog"><div class="mbar"><div class="mfill" style="width:${pct}%;background:${fc}"></div></div><span class="mpct">${pct}%</span></div></td>
-        <td><input type="number" class="tinp" value="${t.estHrs}" min="0" step="0.5" onchange="updateEst('${paper}',${i},this.value)"></td>
-        <td><input type="number" class="tinp" value="${t.doneHrs}" min="0" step="0.5" onchange="updateDone('${paper}',${i},this.value)"></td>
-        <td style="font-size:.72rem;color:${rem===0?'var(--accent3)':'var(--accent4)'}">${rem===0?'✓ Done':rem+'h left'}</td>
-        <td>${ph}</td>
-        <td><button class="abtn${t.notes?' hn':''}" onclick="openNotes('${paper}',${i})" style="${t.notes?'color:var(--accent)':''}">📝</button></td>
-        <td><button class="abtn del" onclick="deleteTopic('${paper}',${i})">✕</button></td>
-      </tr>`;
-    }).join('');
-  }
+function updateHrs(paper, id, val) {
+  const t = D[paper].find(x=>x.id===id); if(!t) return;
+  t.doneHrs = Math.max(0, parseFloat(val)||0);
+  save(); renderAll();
+}
+function delTopic(paper, id) {
+  if (!confirm('Delete this topic?')) return;
+  D[paper] = D[paper].filter(x=>x.id!==id);
+  save(); renderAll();
+}
+function doReset() {
+  if (!confirm('Reset ALL progress? Cannot be undone.')) return;
+  localStorage.removeItem('srt_p5'); localStorage.removeItem('srt_p6');
+  D = load(); renderAll();
+  toast('✅ All progress reset');
 }
 
-function updateStatus(p,i,v){appData[p][i].status=v;if(v==='done')appData[p][i].doneHrs=appData[p][i].estHrs;saveData(appData);renderTopics(p);updateOverview();}
-function updateEst(p,i,v){appData[p][i].estHrs=parseFloat(v)||0;saveData(appData);updateOverview();}
-function updateDone(p,i,v){appData[p][i].doneHrs=parseFloat(v)||0;saveData(appData);updateOverview();}
-function deleteTopic(p,i){if(!confirm('Delete this topic?'))return;appData[p].splice(i,1);saveData(appData);renderTopics(p);updateOverview();}
-
-/* NOTES */
-function openNotes(p,i){
-  eNotesPaper=p;eNotesIdx=i;
-  document.getElementById('notes-modal-title').textContent='Notes — '+appData[p][i].name.slice(0,32);
-  document.getElementById('notes-modal-text').value=appData[p][i].notes||'';
-  document.getElementById('notes-modal').classList.add('open');
+/* ═══ ADD / EDIT MODAL ═══ */
+function openAdd(paper) {
+  document.getElementById('m-paper').value = paper;
+  document.getElementById('m-edit-id').value = '';
+  document.getElementById('modal-ttl').textContent = 'Add New Topic';
+  document.getElementById('modal-save-btn').textContent = 'Add Topic';
+  ['m-name','m-ch','m-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('m-est').value = 3;
+  document.getElementById('m-pri').value = 'medium';
+  document.getElementById('modal-add').classList.add('open');
+  setTimeout(()=>document.getElementById('m-name').focus(),100);
 }
-function saveNotes(){
-  appData[eNotesPaper][eNotesIdx].notes=document.getElementById('notes-modal-text').value;
-  saveData(appData);renderTopics(eNotesPaper);closeModal('notes-modal');
+function openEdit(paper, id) {
+  const t = D[paper].find(x=>x.id===id); if(!t) return;
+  document.getElementById('m-paper').value = paper;
+  document.getElementById('m-edit-id').value = id;
+  document.getElementById('modal-ttl').textContent = 'Edit Topic';
+  document.getElementById('modal-save-btn').textContent = 'Save Changes';
+  document.getElementById('m-name').value = t.name;
+  document.getElementById('m-ch').value = t.ch;
+  document.getElementById('m-est').value = t.hrs;
+  document.getElementById('m-pri').value = t.pri;
+  document.getElementById('m-notes').value = t.notes||'';
+  document.getElementById('modal-add').classList.add('open');
 }
-
-/* ADD TOPIC */
-function openAddTopic(p){
-  document.getElementById('modal-paper').value=p;
-  ['modal-topic-name','modal-chapter','modal-notes'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('modal-est-hrs').value=4;
-  document.getElementById('modal-priority').value='medium';
-  document.getElementById('modal-status').value='not-started';
-  document.getElementById('add-topic-modal').classList.add('open');
-}
-function saveTopic(){
-  const p=document.getElementById('modal-paper').value;
-  const name=document.getElementById('modal-topic-name').value.trim();
-  if(!name){alert('Topic name required');return;}
-  appData[p].push({id:p+'_'+Date.now(),name,chapter:document.getElementById('modal-chapter').value.trim(),
-    estHrs:parseFloat(document.getElementById('modal-est-hrs').value)||4,doneHrs:0,
-    status:document.getElementById('modal-status').value,priority:document.getElementById('modal-priority').value,
-    notes:document.getElementById('modal-notes').value});
-  saveData(appData);renderTopics(p);updateOverview();closeModal('add-topic-modal');
-}
-
-/* OVERVIEW */
-function updateOverview(){
-  const all=[...appData.p5,...appData.p6];
-  const tEst=all.reduce((s,t)=>s+(t.estHrs||0),0);
-  const tDone=all.reduce((s,t)=>s+(t.doneHrs||0),0);
-  const pct=tEst>0?Math.round((tDone/tEst)*100):0;
-  document.getElementById('stat-overall').textContent=pct+'%';
-  document.getElementById('stat-hours').textContent=tDone.toFixed(1)+'h';
-  document.getElementById('stat-done').textContent=all.filter(t=>t.status==='done').length;
-  document.getElementById('stat-done-sub').textContent='of '+all.length+' topics';
-  document.getElementById('stat-remaining').textContent=Math.max(0,tEst-tDone).toFixed(1)+'h';
-  function ps(p,tag){
-    const d=p.filter(t=>t.status==='done').length,ip=p.filter(t=>t.status==='in-progress').length,ns=p.filter(t=>t.status==='not-started').length;
-    const est=p.reduce((s,t)=>s+t.estHrs,0),hrs=p.reduce((s,t)=>s+t.doneHrs,0);
-    const pp=est>0?Math.round((hrs/est)*100):0;
-    document.getElementById(tag+'-bar').style.width=pp+'%';
-    document.getElementById(tag+'-done').textContent=d;document.getElementById(tag+'-ip').textContent=ip;
-    document.getElementById(tag+'-ns').textContent=ns;document.getElementById(tag+'-pct').textContent=pp+'%';
-  }
-  ps(appData.p5,'p5');ps(appData.p6,'p6');
-  function rta(topics,id,color){
-    const sorted=[...topics].sort((a,b)=>b.estHrs-a.estHrs).slice(0,7);
-    document.getElementById(id).innerHTML=sorted.map(t=>{
-      const pct=t.estHrs>0?Math.min(100,Math.round((t.doneHrs/t.estHrs)*100)):0;
-      const rem=Math.max(0,t.estHrs-t.doneHrs);
-      return `<div><div class="tbar-lbl"><span>${t.name.length>30?t.name.slice(0,28)+'…':t.name}</span><span>${t.doneHrs}/${t.estHrs}h (${rem}h left)</span></div><div class="tbar-track"><div class="tbar-fill" style="width:${pct}%;background:${color}"></div></div></div>`;
-    }).join('');
-  }
-  rta(appData.p5,'p5-time-analysis','#a78bfa');
-  rta(appData.p6,'p6-time-analysis','#34d399');
-  renderSessionLog();
-}
-
-function renderSessionLog(){
-  const s=JSON.parse(localStorage.getItem('ca_sessions')||'[]');
-  const r=[...s].reverse().slice(0,12);
-  const html=r.length?r.map(x=>`<div class="log-entry">
-    <span class="lt">${new Date(x.startTime).toLocaleDateString('en-IN',{day:'numeric',month:'short'})} ${new Date(x.startTime).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}</span>
-    <span class="ln">${x.topicName}</span>
-    <span class="lc">${x.paper.toUpperCase()}</span>
-    <span class="ld">${(x.durationMins/60).toFixed(2)}h</span>
-  </div>`).join(''):'<div class="empty"><div class="big">⏱</div>No sessions yet!</div>';
-  ['study-log-display','full-session-log'].forEach(id=>{const el=document.getElementById(id);if(el)el.innerHTML=html;});
-}
-
-/* SCHEDULE */
-function renderSchedule(){
-  const ei=document.getElementById('exam-date-input');
-  if(!ei.value)ei.value=localStorage.getItem('ca_exam_date')||'';
-  document.getElementById('daily-target').value=localStorage.getItem('ca_daily_target')||'6';
-  const today=new Date(),dow=today.getDay(),mon=new Date(today);
-  mon.setDate(today.getDate()-(dow===0?6:dow-1));
-  const days=Array.from({length:7},(_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return d;});
-  const dn=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
-  const slots=JSON.parse(localStorage.getItem('ca_slots')||'[]');
-  document.getElementById('week-header').innerHTML='<div></div>'+days.map((d,i)=>`<div><div class="wdl">${dn[i]}</div><div class="wdn ${d.toDateString()===today.toDateString()?'today':''}">${d.getDate()}</div></div>`).join('');
-  const hrs=[7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22];
-  let g='';
-  hrs.forEach(h=>{
-    g+=`<div class="hlbl">${h}</div>`;
-    days.forEach(d=>{
-      const ds=d.toISOString().split('T')[0];
-      const m=slots.find(s=>s.date===ds&&parseInt(s.start)===h);
-      g+=`<div class="wcell${m?(m.paper==='p5'?' p5s':' p6s'):''}" onclick="clickCell('${ds}',${h})" title="${m?m.topicName:''}"></div>`;
+function saveModal() {
+  const paper = document.getElementById('m-paper').value;
+  const name = document.getElementById('m-name').value.trim();
+  if (!name) { alert('Topic name required'); return; }
+  const eid = document.getElementById('m-edit-id').value;
+  if (eid) {
+    const t = D[paper].find(x=>x.id===eid); if(t) {
+      t.name=name; t.ch=document.getElementById('m-ch').value.trim()||'—';
+      t.hrs=parseFloat(document.getElementById('m-est').value)||3;
+      t.pri=document.getElementById('m-pri').value;
+      t.notes=document.getElementById('m-notes').value;
+    }
+    toast('✅ Topic updated');
+  } else {
+    D[paper].push({
+      id:paper+'_'+Date.now(), name,
+      ch:document.getElementById('m-ch').value.trim()||'—',
+      hrs:parseFloat(document.getElementById('m-est').value)||3,
+      doneHrs:0,
+      pri:document.getElementById('m-pri').value,
+      notes:document.getElementById('m-notes').value,
+      studied:false, revs:[false,false,false,false,false],
     });
-  });
-  document.getElementById('week-grid').innerHTML=g;
-  const ts=today.toISOString().split('T')[0];
-  const tsl=slots.filter(s=>s.date===ts);
-  document.getElementById('today-slots-list').innerHTML=tsl.length
-    ?tsl.map(s=>`<div class="slot-card"><div class="sdot" style="background:${s.paper==='p5'?'var(--p5)':'var(--p6)'}"></div><div><div class="sname">${s.topicName||'Study Session'}</div><div class="smeta">${s.start} – ${s.end} · ${s.paper.toUpperCase()}</div></div></div>`).join('')
-    :'<div style="font-size:.7rem;color:var(--muted);padding:8px 0">No sessions planned today</div>';
-  const all=[...appData.p5.map(t=>({...t,paper:'p5'})),...appData.p6.map(t=>({...t,paper:'p6'}))];
-  document.getElementById('slot-topic-select').innerHTML=all.map(t=>`<option value="${t.name}|${t.paper}">[${t.paper.toUpperCase()}] ${t.name}</option>`).join('');
-}
-function clickCell(date,h){
-  document.getElementById('slot-date').value=date;
-  document.getElementById('slot-start').value=String(h).padStart(2,'0')+':00';
-  document.getElementById('slot-end').value=String(Math.min(h+2,23)).padStart(2,'0')+':00';
-  document.getElementById('add-slot-modal').classList.add('open');
-}
-function openAddSlot(){
-  document.getElementById('slot-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('slot-start').value='09:00';document.getElementById('slot-end').value='11:00';
-  document.getElementById('add-slot-modal').classList.add('open');
-}
-function saveSlot(){
-  const tv=document.getElementById('slot-topic-select').value;
-  const[topicName,paper]=tv.split('|');
-  const slot={date:document.getElementById('slot-date').value,start:document.getElementById('slot-start').value,end:document.getElementById('slot-end').value,topicName,paper};
-  const s=JSON.parse(localStorage.getItem('ca_slots')||'[]');s.push(slot);
-  localStorage.setItem('ca_slots',JSON.stringify(s));closeModal('add-slot-modal');renderSchedule();
-}
-
-/* TIMER */
-let tInt=null,tSec=0,tRunning=false,tStart=null;
-function populateTimerSelect(){
-  const all=[...appData.p5.map(t=>({...t,paper:'p5'})),...appData.p6.map(t=>({...t,paper:'p6'}))];
-  document.getElementById('timer-topic-select').innerHTML='<option value="">— Select Topic —</option>'+
-    all.map(t=>`<option value="${t.name}|${t.paper}">[${t.paper.toUpperCase()}] ${t.name}</option>`).join('');
-}
-function timerStart(){
-  const tv=document.getElementById('timer-topic-select').value;
-  if(!tv){alert('Select a topic first');return;}
-  tRunning=true;tStart=tStart||new Date();
-  document.getElementById('timer-start-btn').style.display='none';
-  document.getElementById('timer-pause-btn').style.display='';
-  document.getElementById('timer-display').classList.add('run');
-  document.getElementById('timer-active-topic').textContent=tv.split('|')[0];
-  tInt=setInterval(()=>{
-    tSec++;
-    const h=String(Math.floor(tSec/3600)).padStart(2,'0'),m=String(Math.floor((tSec%3600)/60)).padStart(2,'0'),s=String(tSec%60).padStart(2,'0');
-    document.getElementById('timer-display').textContent=`${h}:${m}:${s}`;
-  },1000);
-}
-function timerPause(){
-  clearInterval(tInt);tRunning=false;
-  document.getElementById('timer-start-btn').style.display='';
-  document.getElementById('timer-pause-btn').style.display='none';
-  document.getElementById('timer-display').classList.remove('run');
-}
-function timerStop(){
-  if(tSec<60){alert('Min 1 min to log');clearTimer();return;}
-  const tv=document.getElementById('timer-topic-select').value;if(!tv){clearTimer();return;}
-  const[topicName,paper]=tv.split('|');
-  const dMins=Math.round(tSec/60),dHrs=dMins/60;
-  const idx=appData[paper].findIndex(t=>t.name===topicName);
-  if(idx!==-1){
-    appData[paper][idx].doneHrs=parseFloat((appData[paper][idx].doneHrs+dHrs).toFixed(2));
-    if(appData[paper][idx].status==='not-started')appData[paper][idx].status='in-progress';
+    toast('✅ Topic added');
   }
-  const s=JSON.parse(localStorage.getItem('ca_sessions')||'[]');
-  s.push({topicName,paper,durationMins:dMins,startTime:tStart?.toISOString()||new Date().toISOString()});
-  localStorage.setItem('ca_sessions',JSON.stringify(s));
-  saveData(appData);renderTopics(paper);updateOverview();clearTimer();
-  alert(`✅ Logged: ${dHrs.toFixed(2)}h for ${topicName}`);
+  save(); renderAll(); closeModal();
 }
-function clearTimer(){
-  clearInterval(tInt);tSec=0;tRunning=false;tStart=null;
-  document.getElementById('timer-display').textContent='00:00:00';
-  document.getElementById('timer-display').classList.remove('run');
-  document.getElementById('timer-active-topic').textContent='—';
-  document.getElementById('timer-start-btn').style.display='';
-  document.getElementById('timer-pause-btn').style.display='none';
+function viewNotes(name, notes) {
+  document.getElementById('notes-ttl').textContent = name;
+  document.getElementById('notes-body').textContent = notes || '(No notes yet)';
+  document.getElementById('modal-notes').classList.add('open');
+}
+function closeModal() { document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('open')); }
+document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeModal();}));
+
+/* ═══ FILTER / SEARCH ═══ */
+function setChip(el, listId, f) {
+  el.closest('.fbar').querySelectorAll('.chip').forEach(c=>{c.classList.remove('ca');});
+  el.classList.add('ca');
+  chipSt[listId]=f; renderList(listId);
+}
+function setSearch(listId,q) { srchSt[listId]=q.toLowerCase(); renderList(listId); }
+function applyF(topics, listId) {
+  let out = topics;
+  const q = srchSt[listId]||'';
+  if (q) out=out.filter(t=>t.name.toLowerCase().includes(q)||t.ch.toLowerCase().includes(q));
+  const f = chipSt[listId]||'all';
+  if(f==='ns') out=out.filter(t=>!t.studied);
+  if(f==='rv') out=out.filter(t=>t.studied&&!isMa(t));
+  if(f==='ma') out=out.filter(t=>isMa(t));
+  return out;
 }
 
-/* MODALS */
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+/* ═══ HELPERS ═══ */
+const isMa = t => t.revs[4]===true;
+const nRevs = t => t.revs.filter(Boolean).length;
+const PRI = {high:'ph',medium:'pm',low:'pl'};
+const PRIL = {high:'H',medium:'M',low:'L'};
+const VCLS = ['v1','v2','v3','v4','v5'];
+const MXRC = ['mx-r1','mx-r2','mx-r3','mx-r4','mx-r5'];
 
-/* INIT */
-function init(){
-  updateDate();setInterval(updateDate,60000);
-  renderTopics('p5');renderTopics('p6');updateOverview();populateTimerSelect();
-  const ed=localStorage.getItem('ca_exam_date');if(ed){const i=document.getElementById('exam-date-input');if(i)i.value=ed;}
+/* ═══ BUILD ROW ═══ */
+function buildRow(paper, t) {
+  const cross = isMa(t) ? ' cross' : '';
+  const studyTag = t.studied
+    ? `<span class="stag yes" onclick="toggleStudied('${paper}','${t.id}')">✓ Studied</span>`
+    : `<span class="stag no"  onclick="toggleStudied('${paper}','${t.id}')">Mark Studied</span>`;
+
+  const dots = t.revs.map((done,i)=>{
+    const locked = !t.studied||(i>0&&!t.revs[i-1]&&!done);
+    return `<button class="rdot ${VCLS[i]}${done?' on':''}" ${locked?'disabled':''} ${!locked?`onclick="toggleRev('${paper}','${t.id}',${i})"`:''}
+      title="${locked?'Study first / complete earlier revision':done?`Rev ${i+1} done — click to undo`:`Mark Rev ${i+1} done`}">${i+1}</button>`;
+  }).join('');
+
+  const pct = t.hrs>0?Math.min(100,Math.round((t.doneHrs/t.hrs)*100)):0;
+  const hColor = pct>=100?'var(--green)':pct>=50?'var(--p6)':'var(--p5m)';
+  const notesCell = t.notes
+    ? `<span class="note-txt" onclick="viewNotes('${t.name.replace(/'/g,"\\'")}','${t.notes.replace(/'/g,"\\'").replace(/\n/g,'\\n')}')" title="Click to view notes">${t.notes.slice(0,45)}…</span>`
+    : `<span class="note-add" onclick="openEdit('${paper}','${t.id}')">+ add</span>`;
+
+  return `<tr>
+    <td class="tc"><div class="tick${t.studied?' on':''}" onclick="toggleStudied('${paper}','${t.id}')"></div></td>
+    <td class="tnc">
+      <div class="tn${cross}">${t.name} <span class="pri ${PRI[t.pri]}">${PRIL[t.pri]}</span></div>
+      <div class="tch">${t.ch}</div>
+    </td>
+    <td class="stc">${studyTag}</td>
+    <td class="rvc"><div class="rv-dots">${dots}</div></td>
+    <td class="hrc">
+      <div class="hrs-txt">${t.doneHrs}h / ${t.hrs}h</div>
+      <div class="hrs-bar"><div class="hrs-fill" style="width:${pct}%;background:${hColor}"></div></div>
+    </td>
+    <td class="ntc">${notesCell}</td>
+    <td style="width:54px;text-align:center;white-space:nowrap">
+      <button class="delbtn" onclick="openEdit('${paper}','${t.id}')" title="Edit" style="margin-right:3px">✎</button>
+      <button class="delbtn" onclick="delTopic('${paper}','${t.id}')" title="Delete">✕</button>
+    </td>
+  </tr>`;
 }
-init();
+
+const TH = `<div class="t-wrap"><table class="t-table"><thead><tr>
+  <th style="width:32px"></th>
+  <th>Topic</th>
+  <th style="width:108px;text-align:center">Study</th>
+  <th style="width:180px;text-align:center">Revisions 1→5</th>
+  <th style="width:100px">Hours</th>
+  <th>Notes</th>
+  <th style="width:56px"></th>
+</tr></thead><tbody>`;
+
+/* ═══ BUILD GROUPED LIST ═══ */
+function buildGrouped(paper, topics) {
+  if (!topics.length) return `<div class="empty"><div class="ei">🔍</div><p>No topics match.</p></div>`;
+  const grps = {};
+  topics.forEach(t => { if(!grps[t.ch]) grps[t.ch]=[]; grps[t.ch].push(t); });
+  return Object.entries(grps).map(([ch,cts])=>{
+    const key = (paper+'|'+ch).replace(/[^a-z0-9]/gi,'_');
+    if(openSec[key]===undefined) openSec[key]=true;
+    const open = openSec[key];
+    const tot=cts.length, st=cts.filter(t=>t.studied).length, ma=cts.filter(t=>isMa(t)).length;
+    return `<div class="sec-wrap">
+      <div class="sec-hdr${open?' open':''}" onclick="toggleSec('${key}','${paper}')">
+        <span class="sec-arrow${open?' open':''}">▶</span>
+        <span class="sec-title">${ch}</span>
+        <span class="sec-chip">${tot} topics</span>
+        ${ma?`<span class="sec-chip g">${ma} mastered</span>`:''}
+        <span class="sec-pct"><strong>${st}/${tot}</strong> studied</span>
+      </div>
+      <div id="sec-${key}" style="display:${open?'block':'none'}">
+        ${TH}${cts.map(t=>buildRow(paper,t)).join('')}</tbody></table></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function buildFlat(paper, topics) {
+  if (!topics.length) return `<div class="empty"><div class="ei">🎉</div><p>Nothing here right now.</p></div>`;
+  return `<div class="sec-wrap">${TH}${topics.map(t=>buildRow(paper,t)).join('')}</tbody></table></div></div>`;
+}
+function toggleSec(key, paper) {
+  openSec[key]=!openSec[key];
+  renderList(paper+'-all');
+}
+
+/* ═══ RENDER LIST ═══ */
+function renderList(listId) {
+  const paper = listId.startsWith('p5')?'p5':'p6';
+  const el = document.getElementById('body-'+listId); if(!el) return;
+  let topics;
+  if      (listId.endsWith('-all')) { topics=applyF(D[paper],listId); el.innerHTML=buildGrouped(paper,topics); }
+  else if (listId.endsWith('-ns'))  { topics=D[paper].filter(t=>!t.studied); el.innerHTML=buildFlat(paper,topics); }
+  else if (listId.endsWith('-rev')) { topics=D[paper].filter(t=>t.studied&&!isMa(t)); el.innerHTML=buildFlat(paper,topics); }
+  const cnt=document.getElementById('cnt-'+listId); if(cnt) cnt.textContent=(topics?.length||0)+' topics';
+}
+
+/* ═══ BADGES ═══ */
+function updateBadges() {
+  ['p5','p6'].forEach(p=>{
+    const ts=D[p];
+    document.getElementById('nb-'+p+'-all').textContent = ts.length;
+    document.getElementById('nb-'+p+'-ns').textContent  = ts.filter(t=>!t.studied).length;
+    document.getElementById('nb-'+p+'-rev').textContent = ts.filter(t=>t.studied&&!isMa(t)).length;
+  });
+  const all=[...D.p5,...D.p6];
+  const st=all.filter(t=>t.studied).length, ma=all.filter(t=>isMa(t)).length, tot=all.length;
+  const rvd=all.reduce((s,t)=>s+nRevs(t),0);
+  const hrs=all.reduce((s,t)=>s+t.doneHrs,0);
+  const pct=tot>0?Math.round(((st+rvd)/(tot*6))*100):0;
+  document.getElementById('sf-st').textContent  = st+'/'+tot;
+  document.getElementById('sf-ma').textContent  = ma+'/'+tot;
+  document.getElementById('sf-hrs').textContent = hrs.toFixed(1)+'h';
+  document.getElementById('sf-fill').style.width = Math.min(100,pct)+'%';
+}
+
+/* ═══ OVERVIEW ═══ */
+function renderOverview() {
+  const all=[...D.p5,...D.p6];
+  const tot=all.length, st=all.filter(t=>t.studied).length;
+  const ma=all.filter(t=>isMa(t)).length;
+  const hrs=all.reduce((s,t)=>s+t.doneHrs,0);
+  const estHrs=all.reduce((s,t)=>s+t.hrs,0);
+  const rvd=all.reduce((s,t)=>s+nRevs(t),0);
+  const score=tot>0?Math.round(((st+rvd)/(tot*6))*100):0;
+
+  const s=id=>document.getElementById(id);
+  s('ov-tot').textContent=tot; s('ov-st').textContent=st;
+  s('ov-ma').textContent=ma;
+  s('ov-hrs').textContent=hrs.toFixed(1)+'h'; s('ov-hrs-tot').textContent=estHrs+'h';
+  s('ov-score').textContent=score+'%';
+
+  // rings
+  function ring(ringId,txtId,pct){
+    const C=2*Math.PI*34;
+    s(ringId).setAttribute('stroke-dashoffset',(C*(1-pct/100)).toFixed(2));
+    s(txtId).textContent=pct+'%';
+  }
+  ['p5','p6'].forEach(p=>{
+    const ts=D[p], tot2=ts.length;
+    const st2=ts.filter(t=>t.studied).length, ma2=ts.filter(t=>isMa(t)).length;
+    const rv2=ts.reduce((acc,t)=>acc+nRevs(t),0);
+    const h=ts.reduce((acc,t)=>acc+t.doneHrs,0);
+    const pp=tot2>0?Math.round(((st2+rv2)/(tot2*6))*100):0;
+    ring('ring-'+p,'ring-'+p+'-txt',pp);
+    s(p+'-st').textContent=st2; s(p+'-rv').textContent=ts.filter(t=>t.studied&&!isMa(t)).length;
+    s(p+'-ma').textContent=ma2; s(p+'-hr').textContent=h.toFixed(1)+'h';
+  });
+
+  // daily analysis
+  const daily=parseFloat(localStorage.getItem('srt_daily')||'6');
+  const remHrs=Math.max(0,estHrs-hrs);
+  const daysNeed=remHrs>0?Math.ceil(remHrs/daily):0;
+  const ex=localStorage.getItem('srt_exam');
+  const items=[
+    {l:'📚 Hours Remaining',v:`<strong style="color:var(--orange)">${remHrs.toFixed(1)}h</strong>`},
+    {l:'🎯 Daily Target',v:`<strong>${daily}h / day</strong>`},
+    {l:'🗓 Days Needed',v:`<strong style="color:var(--p5)">${daysNeed} days</strong>`},
+  ];
+  if(ex){
+    const dLeft=Math.max(0,Math.ceil((new Date(ex)-new Date())/86400000));
+    const req=dLeft>0?(remHrs/dLeft).toFixed(1):'—';
+    items.push({l:'📅 Days to Exam',v:`<strong>${dLeft}</strong>`});
+    items.push({l:'⚡ Required Daily',v:`<strong style="color:${parseFloat(req)>daily?'var(--red)':'var(--green)'}">${req}h/day</strong>`});
+    items.push({l:'📈 Rev. Rounds Done',v:`<strong>${rvd}/${st*5}</strong>`});
+  }
+  s('daily-analysis').innerHTML=items.map(it=>`
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:7px;padding:10px 12px">
+      <div style="font-size:.57rem;color:var(--muted);margin-bottom:4px">${it.l}</div>
+      <div style="font-size:.85rem">${it.v}</div>
+    </div>`).join('');
+}
+
+/* ═══ MATRIX ═══ */
+function renderMatrix() {
+  const MXRC=['mx-r1','mx-r2','mx-r3','mx-r4','mx-r5'];
+  ['p5','p6'].forEach(p=>{
+    document.getElementById('mx-'+p).innerHTML=D[p].map(t=>`<tr>
+      <td class="mx-nm" title="${t.name}">${t.name}</td>
+      <td class="mx-ch">${t.ch}</td>
+      <td style="text-align:center"><div class="mx-box${t.studied?' mx-s':' mx-em'}">${t.studied?'✓':'—'}</div></td>
+      ${t.revs.map((done,i)=>{
+        const locked=!t.studied||(i>0&&!t.revs[i-1]&&!done);
+        const cls=done?MXRC[i]:('mx-box mx-em'+(locked?' mx-lk':''));
+        return `<td style="text-align:center"><div class="${done?'mx-box '+MXRC[i]:cls}">${done?'✓':i+1}</div></td>`;
+      }).join('')}
+    </tr>`).join('');
+  });
+}
+
+/* ═══ RENDER ALL ═══ */
+function renderAll() {
+  renderOverview(); updateBadges();
+  ['p5-all','p5-ns','p5-rev','p6-all','p6-ns','p6-rev'].forEach(renderList);
+  renderMatrix();
+}
+
+/* ═══ TOAST ═══ */
+let _tt;
+function toast(msg) {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(_tt); _tt=setTimeout(()=>el.classList.remove('show'),2200);
+}
+
+/* ═══ INIT ═══ */
+const stored_daily=localStorage.getItem('srt_daily');
+if(stored_daily) document.getElementById('daily-tgt').value=stored_daily;
+refreshExam();
+document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+renderAll();
 </script>
 </body>
 </html>
